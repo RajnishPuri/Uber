@@ -55,6 +55,8 @@ const UserSignup = () => {
         try {
             console.log(import.meta.env.VITE_BASE_URL);
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/register`, newUser);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('role', response.data.role);
             console.log(response.data);
             alert('User Registered Successfully');
             navigate('/home');

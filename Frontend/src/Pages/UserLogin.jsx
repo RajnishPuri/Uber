@@ -21,7 +21,10 @@ const UserLogin = () => {
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/login`, newUserData);
             console.log(response.data);
             alert('User Logged In Successfully');
-            navigate('/home');
+            setUser(response.data);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('role', response.data.role);
+            navigate('/userhome');
         }
         catch (e) {
             console.log(e);

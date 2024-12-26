@@ -42,7 +42,8 @@ exports.registerPilot = async (req, res, next) => {
             success: true,
             message: 'Pilot Registered Successfully',
             token,
-            pilot
+            pilot,
+            role: 'pilot'
         })
     }
     catch (error) {
@@ -85,7 +86,8 @@ exports.login = async (req, res, next) => {
             success: true,
             message: 'Login Successfully',
             token,
-            pilot
+            pilot,
+            role: 'pilot'
         });
     }
     catch

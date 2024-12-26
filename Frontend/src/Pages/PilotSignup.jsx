@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Uber_Logo_Black from '/Uber_Logo_Black.png'
 import Input from "../components/Input"
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter"
 import { Mail, Lock, User, Car, Armchair, PaintBucket, Book } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
-import { set, z } from 'zod'
-
+import { z } from 'zod'
+import { PilotDataContext } from '../Context/PilotContext'
+import axios from 'axios'
 
 const PilotSignup = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const PilotSignup = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [vehicleColor, setVehicleColor] = useState('');
     const [vehicleNumber, setVehicleNumber] = useState('');
-    const [pilotData, setPilotData] = useState({});
+    const { pilot, setPilot } = useContext(PilotDataContext);
 
 
     const passwordSchema = z.string()
@@ -36,27 +37,54 @@ const PilotSignup = () => {
         path: ["confirmPassword"],
     });
 
-    const submitHandler = (e) => {
+    const submitHandler = async (e) => {
         e.preventDefault();
 
+        // Validate input fields
         const validationResult = signupSchema.safeParse({ email, password, confirmPassword });
         if (!validationResult.success) {
             alert(validationResult.error.errors.map(err => err.message).join(", "));
             return;
         }
-        setPilotData({
+
+        console.log(vehicleColor, vehicleNumber, selectedOption, selectedCapacity);
+
+        const newData = {
             fullName: {
                 firstName: firstName,
-                lastName: lastName
+                lastName: lastName,
             },
             email: email,
             password: password,
-            vehicleColor: vehicleColor,
-            vehicleNumber: vehicleNumber,
-            vehicleType: selectedOption,
-            vehicleCapacity: selectedCapacity
-        })
+            vehicle: {
+                color: vehicleColor,
+                plate: vehicleNumber,
+                vehicleType: selectedOption,
+                capacity: selectedCapacity,
+            }
+        };
 
+        console.log(newData);
+
+        try {
+            // Make the API request with await
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/pilot/register`, newData);
+            console.log(response.data);
+
+            // Handle successful registration
+            alert('Pilot Registered Successfully');
+            setPilot(response.data);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('role', response.data.role);
+
+            // Redirect after successful registration
+            navigate('/pilothome');
+        } catch (e) {
+            console.error('Error during registration:', e);
+            alert('Registration failed. Please try again.');
+        }
+
+        // Clear form fields
         setFirstName('');
         setLastName('');
         setEmail('');
@@ -66,7 +94,8 @@ const PilotSignup = () => {
         setVehicleNumber('');
         setSelectedOption('');
         setSelectedCapacity('');
-    }
+    };
+
 
     const loginHandler = () => {
         navigate('/pilotLogin');

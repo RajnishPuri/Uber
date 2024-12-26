@@ -4,7 +4,12 @@ import PilotLogin from "./Pages/PilotLogin"
 import UserLogin from "./Pages/UserLogin"
 import UserSignup from "./Pages/UserSignup"
 import PilotSignup from "./Pages/PilotSignup"
-import Home from "./Pages/Home"
+import UserHome from "./Pages/UserHome"
+import UserProtectedWrapper from "./Pages/UserProtectedWrapper"
+import UserLogout from "./Pages/UserLogout"
+import PilotProtectedWrapper from "./Pages/PilotProtectedRoute"
+import PilotHome from "./Pages/PilotHome"
+import PilotLogout from "./Pages/PilotLogout"
 
 const App = () => {
 
@@ -16,7 +21,15 @@ const App = () => {
         <Route path="/userSignup" element={<UserSignup />} />
         <Route path="/pilotLogin" element={<PilotLogin />} />
         <Route path="/pilotSignup" element={<PilotSignup />} />
-        <Route path='/home' element={<Home />} />
+
+        <Route path='/userhome' element={<UserProtectedWrapper><UserHome /></UserProtectedWrapper>} />
+        <Route path='/userLogout' element={<UserProtectedWrapper><UserLogout /></UserProtectedWrapper>} />
+
+        <Route path="/pilothome" element={<PilotProtectedWrapper><PilotHome /></PilotProtectedWrapper>} />
+        <Route path="/pilotLogout" element={<PilotProtectedWrapper><PilotLogout /></PilotProtectedWrapper>} />
+
+
+
       </Routes>
     </div>
   )

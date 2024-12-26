@@ -1,21 +1,20 @@
-import { UserDataContext } from "../Context/UserContext"
 import { useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { useEffect } from "react"
+import { PilotDataContext } from "../Context/PilotContext"
 
-const UserProtectedWrapper = ({ children }) => {
+const PilotProtectedWrapper = ({ children }) => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
     console.log(role);
-
     useEffect(() => {
-        if (!token || role !== "user") {
-            navigate("/userLogin")
+        if (!token || role !== "pilot") {
+            navigate("/pilotLogin")
         }
     }, [token])
 
-    const { user } = useContext(UserDataContext);
+    const { pilot } = useContext(PilotDataContext);
 
     return (
         <>
@@ -24,4 +23,4 @@ const UserProtectedWrapper = ({ children }) => {
     )
 }
 
-export default UserProtectedWrapper
+export default PilotProtectedWrapper

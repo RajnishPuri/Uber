@@ -21,7 +21,7 @@ exports.registerUser = async (req, res, next) => {
 
     const token = await user.generateAuthToken();
 
-    res.status(201).json({ token, user });
+    res.status(201).json({ token, user, role: 'user' });
 
 }
 
@@ -64,7 +64,8 @@ exports.login = async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: "Login successful!",
-        token
+        token,
+        role: "user"
     });
 };
 
