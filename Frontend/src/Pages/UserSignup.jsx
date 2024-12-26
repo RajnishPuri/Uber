@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Uber_Logo_Black from '/Uber_Logo_Black.png'
 import Input from "../components/Input"
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter"
@@ -6,6 +6,8 @@ import PasswordStrengthMeter from "../components/PasswordStrengthMeter"
 import { Mail, Lock, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import axios from 'axios'
+import { UserDataContext } from '../Context/UserContext'
 
 
 const UserSignup = () => {
@@ -15,7 +17,7 @@ const UserSignup = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [userData, setUserData] = useState({});
+    const { user, setUser } = useContext(UserDataContext);
 
     const passwordSchema = z.string()
         .min(6, "Password must be at least 6 characters")
@@ -34,21 +36,33 @@ const UserSignup = () => {
     });
 
 
-    const submitHandler = (e) => {
+    const submitHandler = async (e) => {
         e.preventDefault();
         const validationResult = signupSchema.safeParse({ email, password, confirmPassword });
         if (!validationResult.success) {
             alert(validationResult.error.errors.map(err => err.message).join(", "));
             return;
         }
-        setUserData({
+        const newUser = {
             fullName: {
                 firstName: firstName,
                 lastName: lastName
             },
             email: email,
             password: password
-        })
+        }
+
+        try {
+            console.log(import.meta.env.VITE_BASE_URL);
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/register`, newUser);
+            console.log(response.data);
+            alert('User Registered Successfully');
+            navigate('/home');
+        } catch (error) {
+            console.error(error);
+            alert('User Registration Failed');
+        }
+
         setFirstName('');
         setLastName('');
         setEmail('');
@@ -113,7 +127,7 @@ const UserSignup = () => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                         <PasswordStrengthMeter password={password} />
-                        <button className="w-3/4 bg-black text-white py-3 rounded mt-2">Login</button>
+                        <button className="w-3/4 bg-black text-white py-3 rounded mt-2">Create Account</button>
                     </form>
                 </div>
                 <div className="flex justify-center items-center mt-4">

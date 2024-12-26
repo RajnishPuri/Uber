@@ -1,20 +1,32 @@
 import { Mail, Lock } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Uber_Logo_Black from '/Uber_Logo_Black.png'
 import Input from "../components/Input"
 import { useNavigate } from 'react-router-dom'
+import { UserDataContext } from '../Context/UserContext'
+import axios from 'axios'
+
 const UserLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [userData, setUserData] = useState({});
+    const { user, setUser } = useContext(UserDataContext);
 
     const navigate = useNavigate();
 
-    const formSubmit = (e) => {
+    const formSubmit = async (e) => {
         e.preventDefault();
         const newUserData = { email: email, password: password };
-        setUserData(newUserData);
-        console.log(userData);
+
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/login`, newUserData);
+            console.log(response.data);
+            alert('User Logged In Successfully');
+            navigate('/home');
+        }
+        catch (e) {
+            console.log(e);
+        }
+
         setEmail('');
         setPassword('');
     };
