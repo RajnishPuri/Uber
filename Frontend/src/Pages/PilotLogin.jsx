@@ -1,12 +1,14 @@
 import { Mail, Lock } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Uber_Logo_Black from '/Uber_Logo_Black.png'
 import Input from "../components/Input"
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { PilotDataContext } from '../Context/PilotContext'
 const PilotLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { pilot, setPilot } = useContext(PilotDataContext);
 
     const navigate = useNavigate();
 
@@ -18,6 +20,7 @@ const PilotLogin = () => {
             alert('Pilot Logged In Successfully');
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('role', response.data.role);
+            setPilot(response.data);
             setEmail('');
             setPassword('');
             navigate('/pilothome');
