@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Uber_Logo_Black from '/Uber_Logo_Black.png'
 import Input from "../components/Input"
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 const PilotLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -11,10 +12,19 @@ const PilotLogin = () => {
 
     const formSubmit = async (e) => {
         e.preventDefault();
-        const newPilotData = { email: email, password: password };
-        console.log(newPilotData);
-        setEmail('');
-        setPassword('');
+        try {
+            const newPilotData = { email: email, password: password };
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/pilot/login`, newPilotData);
+            alert('Pilot Logged In Successfully');
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('role', response.data.role);
+            setEmail('');
+            setPassword('');
+            navigate('/pilothome');
+        }
+        catch (e) {
+            console.log(e);
+        }
     };
 
     const pilotSignUpHandler = () => {

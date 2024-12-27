@@ -19,7 +19,6 @@ const UserLogin = () => {
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/login`, newUserData);
-            console.log(response.data);
             alert('User Logged In Successfully');
             setUser(response.data);
             localStorage.setItem('token', response.data.token);

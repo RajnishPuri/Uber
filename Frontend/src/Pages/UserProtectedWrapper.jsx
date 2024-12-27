@@ -7,7 +7,6 @@ const UserProtectedWrapper = ({ children }) => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    console.log(role);
 
     useEffect(() => {
         if (!token || role !== "user") {

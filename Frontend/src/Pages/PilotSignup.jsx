@@ -40,7 +40,6 @@ const PilotSignup = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
 
-        // Validate input fields
         const validationResult = signupSchema.safeParse({ email, password, confirmPassword });
         if (!validationResult.success) {
             alert(validationResult.error.errors.map(err => err.message).join(", "));
@@ -67,24 +66,17 @@ const PilotSignup = () => {
         console.log(newData);
 
         try {
-            // Make the API request with await
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/pilot/register`, newData);
-            console.log(response.data);
-
-            // Handle successful registration
             alert('Pilot Registered Successfully');
             setPilot(response.data);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('role', response.data.role);
-
-            // Redirect after successful registration
             navigate('/pilothome');
         } catch (e) {
             console.error('Error during registration:', e);
             alert('Registration failed. Please try again.');
         }
 
-        // Clear form fields
         setFirstName('');
         setLastName('');
         setEmail('');
@@ -106,7 +98,7 @@ const PilotSignup = () => {
     }
 
     const options = [
-        { value: '', label: 'Enter Vehicle Type' }, // Placeholder option
+        { value: '', label: 'Enter Vehicle Type' },
         { value: 'car', label: 'Car' },
         { value: 'bike', label: 'Bike' },
         { value: 'auto', label: 'Auto' },
