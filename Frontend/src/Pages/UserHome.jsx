@@ -1,25 +1,37 @@
 import Uber_Logo_Black from '/Uber_Logo_Black.png'
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react'
-import { ChevronUp } from 'lucide-react'
-import { MapPin } from 'lucide-react';
 import LocationSearchPanel from '../components/LocationSearchPanel';
+import VehicleOptionpanel from '../components/VehicleOptionpanel';
+import ConfirmVehicle from '../components/ConfirmVehicle';
+
 const UserHome = () => {
     const [panel, setPanel] = useState(false);
     const [pickup, setPickup] = useState('');
     const [drop, setDrop] = useState('');
+    const [vehiclePanel, setVehiclePanel] = useState(false);
+    const [confirmVehicle, setConfirmVehicle] = useState("");
+    const [destination, setDestination] = useState("");
+    const [pickupLocation, setPickupLocation] = useState("101 Pine Street, New York, NY 10001");
+
+    const [locations, setLocations] = useState([
+        { "address": "123 Main Street, Springfield, IL 62701" },
+        { "address": "456 Elm Street, Los Angeles, CA 90001" },
+        { "address": "789 Maple Avenue, Houston, TX 77001" },
+        { "address": "101 Pine Street, New York, NY 10001" }
+    ]);
 
     function formSubmitHandler(e) {
         e.preventDefault();
 
     }
     return (
-        <div className='relative h-screen'>
+        <div className='relative h-screen overflow-hidden'>
             <img className="w-20 absolute left-5 top-5" src={Uber_Logo_Black} alt="" />
             <div className='h-screen w-screen z-1'>
                 <img className='h-full w-full object-cover' src='https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif' />
             </div>
-            <div>
+            <div className='z-2'>
                 <div className='  h-screen absolute top-0 w-full flex flex-col justify-end'>
                     <div className=' h-[25%] p-4 bg-white flex flex-col gap-4 justify-center'>
                         <div className='flex justify-between items-center'>
@@ -47,15 +59,19 @@ const UserHome = () => {
                         </form>
                     </div>
                     {panel ? <div className=' bg-white h-[75%]'>
-                        <LocationSearchPanel />
+                        <LocationSearchPanel locations={locations} vehiclePanel={vehiclePanel} setVehiclePanel={setVehiclePanel} setPanel={setPanel} setDestination={setDestination} setPickupLocation={setPickupLocation} />
                     </div> : null}
 
 
                 </div>
             </div>
+            {vehiclePanel ?
+                <VehicleOptionpanel setVehiclePanel={setVehiclePanel} confirmVehicle={confirmVehicle} setConfirmVehicle={setConfirmVehicle} /> : null
+            }
+            {confirmVehicle ?
+                <ConfirmVehicle setConfirmVehicle={setConfirmVehicle} confirmVehicle={confirmVehicle} destination={destination} pickupLocation={pickupLocation} /> : null
+            }
         </div>
-
-
     )
 }
 
