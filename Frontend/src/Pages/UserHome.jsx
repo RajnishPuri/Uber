@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react'
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import VehicleOptionpanel from '../components/VehicleOptionpanel';
 import ConfirmVehicle from '../components/ConfirmVehicle';
+import RidingPage from './RidingPage';
 
 const UserHome = () => {
     const [panel, setPanel] = useState(false);
@@ -13,6 +14,7 @@ const UserHome = () => {
     const [confirmVehicle, setConfirmVehicle] = useState("");
     const [destination, setDestination] = useState("");
     const [pickupLocation, setPickupLocation] = useState("101 Pine Street, New York, NY 10001");
+    const [isRiding, setIsRiding] = useState(false);
 
     const [locations, setLocations] = useState([
         { "address": "123 Main Street, Springfield, IL 62701" },
@@ -27,11 +29,18 @@ const UserHome = () => {
     }
     return (
         <div className='relative h-screen overflow-hidden'>
+
             <img className="w-20 absolute left-5 top-5" src={Uber_Logo_Black} alt="" />
+
             <div className='h-screen w-screen z-1'>
-                <img className='h-full w-full object-cover' src='https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif' />
+                {!isRiding ?
+
+                    (<img className='h-full w-full object-cover' src='https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif' />) :
+                    (
+                        <RidingPage />
+                    )}
             </div>
-            <div className='z-2'>
+            {confirmVehicle ? "" : (<div className='z-2'>
                 <div className='  h-screen absolute top-0 w-full flex flex-col justify-end'>
                     <div className=' h-[25%] p-4 bg-white flex flex-col gap-4 justify-center'>
                         <div className='flex justify-between items-center'>
@@ -64,12 +73,13 @@ const UserHome = () => {
 
 
                 </div>
-            </div>
+            </div>)}
+
             {vehiclePanel ?
                 <VehicleOptionpanel setVehiclePanel={setVehiclePanel} confirmVehicle={confirmVehicle} setConfirmVehicle={setConfirmVehicle} /> : null
             }
             {confirmVehicle ?
-                <ConfirmVehicle setConfirmVehicle={setConfirmVehicle} confirmVehicle={confirmVehicle} destination={destination} pickupLocation={pickupLocation} /> : null
+                <ConfirmVehicle setConfirmVehicle={setConfirmVehicle} confirmVehicle={confirmVehicle} destination={destination} pickupLocation={pickupLocation} setIsRiding={setIsRiding} /> : null
             }
         </div>
     )
