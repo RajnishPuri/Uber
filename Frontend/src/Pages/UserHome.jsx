@@ -5,6 +5,7 @@ import LocationSearchPanel from '../components/LocationSearchPanel';
 import VehicleOptionpanel from '../components/VehicleOptionpanel';
 import ConfirmVehicle from '../components/ConfirmVehicle';
 import RidingPage from './RidingPage';
+import LiveTrip from './LiveTrip';
 
 const UserHome = () => {
     const [panel, setPanel] = useState(false);
@@ -15,6 +16,7 @@ const UserHome = () => {
     const [destination, setDestination] = useState("");
     const [pickupLocation, setPickupLocation] = useState("101 Pine Street, New York, NY 10001");
     const [isRiding, setIsRiding] = useState(false);
+    const [isRidingConfirmed, setIsRidingConfirmed] = useState(false);
 
     const [locations, setLocations] = useState([
         { "address": "123 Main Street, Springfield, IL 62701" },
@@ -34,11 +36,20 @@ const UserHome = () => {
 
             <div className='h-screen w-screen z-1'>
                 {!isRiding ?
-
+                    // current location
                     (<img className='h-full w-full object-cover' src='https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif' />) :
+                    // 
                     (
-                        <RidingPage />
-                    )}
+                        isRidingConfirmed ?
+                            (
+                                <>
+                                    <LiveTrip destination={destination} pickupLocation={pickupLocation} />
+                                </>
+                            ) :
+                            (< RidingPage destination={destination} pickupLocation={pickupLocation} />
+                            )
+                    )
+                }
             </div>
             {confirmVehicle ? "" : (<div className='z-2'>
                 <div className='  h-screen absolute top-0 w-full flex flex-col justify-end'>
@@ -79,7 +90,7 @@ const UserHome = () => {
                 <VehicleOptionpanel setVehiclePanel={setVehiclePanel} confirmVehicle={confirmVehicle} setConfirmVehicle={setConfirmVehicle} /> : null
             }
             {confirmVehicle ?
-                <ConfirmVehicle setConfirmVehicle={setConfirmVehicle} confirmVehicle={confirmVehicle} destination={destination} pickupLocation={pickupLocation} setIsRiding={setIsRiding} /> : null
+                <ConfirmVehicle setConfirmVehicle={setConfirmVehicle} confirmVehicle={confirmVehicle} destination={destination} pickupLocation={pickupLocation} setIsRiding={setIsRiding} setIsRidingConfirmed={setIsRidingConfirmed} isRidingConfirmed={isRidingConfirmed} isRiding={isRiding} /> : null
             }
         </div>
     )

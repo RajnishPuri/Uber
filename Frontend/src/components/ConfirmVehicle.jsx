@@ -6,7 +6,7 @@ import { useState } from 'react';
 import DriverFound from './DriverFound';
 import Uber_Driver from '/Uber_Driver.png';
 
-const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickupLocation, setIsRiding }) => {
+const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickupLocation, setIsRiding, setIsRidingConfirmed, isRidingConfirmed, isRiding }) => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [isLookingForDriver, setIsLookingForDriver] = useState(false);
     const [driverData, setDriverData] = useState(null);
@@ -98,7 +98,7 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
 
                     {isLookingForDriver ? (
                         driverData ? (
-                            <DriverFound driverData={driverData} setConfirmVehicle={setConfirmVehicle} setDriverData={setDriverData} setIsRiding={setIsRiding} />
+                            <DriverFound driverData={driverData} setConfirmVehicle={setConfirmVehicle} setDriverData={setDriverData} setIsRiding={setIsRiding} setIsRidingConfirmed={setIsRidingConfirmed} isRidingConfirmed={isRidingConfirmed} isRiding={isRiding} />
                         ) : (
                             <div className="flex flex-col items-center justify-center gap-4 mt-4">
                                 <div className="loader border-4 border-t-green-600 border-gray-300 rounded-full w-12 h-12 animate-spin"></div>
