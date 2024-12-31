@@ -53,7 +53,7 @@ const UserHome = () => {
             </div>
             {confirmVehicle ? "" : (<div className='z-2'>
                 <div className='  h-screen absolute top-0 w-full flex flex-col justify-end'>
-                    <div className=' h-[25%] p-4 bg-white flex flex-col gap-4 justify-center'>
+                    <div className=' h-[35%] p-4 bg-white flex flex-col gap-4 justify-center'>
                         <div className='flex justify-between items-center'>
 
                             <h4 className='text-2xl font-semibold text-center'>Find a Trip</h4>
@@ -76,6 +76,7 @@ const UserHome = () => {
                             <input className=' bg-[#eee] px-8 py-2 text-base rounded-lg w-full' type="text" placeholder='Add Drop Location' onClick={() => setPanel(true)} value={drop} onChange={(e) => {
                                 setDrop(e.target.value);
                             }} />
+                            <button className='bg-black text-white px-8 py-2 rounded-lg' type='submit'>Find a Trip</button>
                         </form>
                     </div>
                     {panel ? <div className=' bg-white h-[75%]'>

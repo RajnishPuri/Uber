@@ -5,6 +5,7 @@ const Pilot = require('../models/pilot.model');
 
 exports.authMiddleware = async (req, res, next) => {
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    console.log(token);
 
     const blackListToken = await BlackListToken.findOne({ token: token });
 
@@ -17,6 +18,7 @@ exports.authMiddleware = async (req, res, next) => {
             const decoded_token = jwt.verify(token, process.env.JWT_SECRET);
             const user = await User.findById(decoded_token._id);
             req.user = user;
+            console.log(user);
             return next();
         } catch (error) {
             return res.status(401).json({ message: 'Invalid or expired token' });

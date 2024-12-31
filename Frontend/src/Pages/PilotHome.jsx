@@ -74,6 +74,10 @@ const PilotHome = () => {
         setIsPanelOpen(prevState => !prevState);
     };
 
+    const handleLocationChange = (newLocation) => {
+        setCurrentLocation(newLocation);
+    };
+
     return (
         <div className="relative h-screen overflow-hidden">
             {/* Logo */}
@@ -131,9 +135,11 @@ const PilotHome = () => {
 
             {/* Main Content */}
             <div className="h-[calc(100%-64px)] mt-16 relative z-1">
-                {currentRide === null ? ( // Explicitly check for null
-                    // Current location (placeholder image)
-                    <PilotHomeMap currentLocation={currentLocation} setCurrentLocation={setCurrentLocation} />
+                {currentRide === null ? ( // Explicitly check for null (no ride)
+                    <PilotHomeMap
+                        currentLocation={currentLocation}
+                        setCurrentLocation={handleLocationChange}
+                    />
                 ) : status === "picking" ? (
                     <Picking destination={destination} pickupLocation={pickupLocation} />
                 ) : status === "droping" ? (

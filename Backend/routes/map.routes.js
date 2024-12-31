@@ -20,7 +20,6 @@ mapRouter.get('/get-driving-distance-coordinates',
     getDrivingDistanceWithCoordinates);
 
 mapRouter.get('/autocomplete',
-    authMiddleware,
     getAutoCompleteSuggestions);
 
 module.exports = mapRouter;
