@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 
 const userRouter = require('./routes/user.routes');
 const pilotRouter = require('./routes/pilot.routes');
+const mapRoutes = require('./routes/map.routes');
 
 const app = express();
 
@@ -21,5 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1/auth', userRouter);
 app.use('/api/v1/pilot', pilotRouter);
+app.use('/api/v1/maps', mapRoutes);
 
 module.exports = app;
