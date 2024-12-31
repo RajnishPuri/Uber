@@ -3,7 +3,7 @@ import { GoogleMap, LoadScript } from "@react-google-maps/api";
 
 const libraries = ["marker"];
 
-const PilotHomeMap = ({ currentLocation, setCurrentLocation }) => {
+const UserHomeMap = ({ currentLocation, setCurrentLocation }) => {
     const [location, setLocation] = useState(null);
 
     useEffect(() => {
@@ -41,12 +41,9 @@ const PilotHomeMap = ({ currentLocation, setCurrentLocation }) => {
             return marker;
         }
     };
-
     return (
         <div className="h-[calc(100%-64px)]">
-            {console.log(location)}
             {location ? (
-
                 <LoadScript googleMapsApiKey={googleMapsApiKey} libraries={libraries}>
                     <GoogleMap
                         mapContainerStyle={{ width: "100%", height: "100%" }}
@@ -64,6 +61,6 @@ const PilotHomeMap = ({ currentLocation, setCurrentLocation }) => {
             )}
         </div>
     );
-};
+}
 
-export default PilotHomeMap;
+export default UserHomeMap
