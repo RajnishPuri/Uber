@@ -26,7 +26,7 @@ exports.getCoordinates = async (req, res) => {
 // Function to calculate the distance between two coordinates
 
 
-exports.getDrivingDistanceWithCoordinates = async (req, res) => {
+exports.getDrivingDistanceWithCoordinatesParams = async (req, res) => {
     const { lat1, lon1, lat2, lon2 } = req.query;
 
     // Check if all coordinates are provided
@@ -51,6 +51,24 @@ exports.getDrivingDistanceWithCoordinates = async (req, res) => {
         });
     }
 };
+
+exports.getDrivingDistanceWithCoordinates = async (lat1, lon1, lat2, lon2) => {
+    console.log('Received coordinates:', lat1, lon1, lat2, lon2);
+    if (!lat1 || !lon1 || !lat2 || !lon2) {
+        throw new Error('All coordinates (lat1, lon1, lat2, lon2) are required.');
+    }
+
+    try {
+        const origin = `${lat1},${lon1}`;
+        const destination = `${lat2},${lon2}`;
+        const result = await getDrivingDistance(origin, destination);
+        return result;
+    } catch (error) {
+        console.error('Error fetching distance with coordinates:', error.message);
+        throw new Error('Failed to fetch driving distance.');
+    }
+};
+
 
 exports.getAutoCompleteSuggestions = async (req, res) => {
     const { input } = req.query;

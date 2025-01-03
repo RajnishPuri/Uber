@@ -44,7 +44,6 @@ const PilotHomeMap = ({ currentLocation, setCurrentLocation }) => {
 
     return (
         <div className="h-[calc(100%-64px)]">
-            {console.log(location)}
             {location ? (
 
                 <LoadScript googleMapsApiKey={googleMapsApiKey} libraries={libraries}>

@@ -4,42 +4,16 @@ import Uber_Car from '/Uber_Car.jpg';
 import Uber_Bike from '/Uber_Bike.jpg';
 import Uber_Auto from '/Uber_Auto.jpg';
 
-const VehicleOptionPanel = ({ setVehiclePanel, confirmVehicle, setConfirmVehicle }) => {
-    const [vehicleOptions, setVehicleOptions] = useState([
-        {
-            "type": "Car",
-            "seats": 4,
-            "distance": "2 min away",
-            "price": 100
-        },
-        {
-            "type": "Bike",
-            "seats": 1,
-            "distance": "5 min away",
-            "price": 200
-        },
-        {
-            "type": "Auto",
-            "seats": 3,
-            "distance": "7 min away",
-            "price": 50
-        }
-    ]);
+const VehicleOptionPanel = ({ vehicleData, setVehicleData, status, setStatus }) => {
+    const [vehicleOptions, setVehicleOptions] = useState(vehicleData.vehicleDetails || []);
+
 
     useEffect(() => {
-        // Fetch data from backend
-        const fetchData = async () => {
-            try {
-                // const response = await fetch("https://your-backend-api.com/vehicle-options");
-                // const data = await response.json();
-                // setVehicleOptions(data);
-            } catch (error) {
-                console.error("Error fetching vehicle data:", error);
-            }
-        };
-
-        fetchData();
-    }, []);
+        // Check if vehicleData has been passed as prop and update the vehicle options
+        if (vehicleData && vehicleData.length > 0) {
+            setVehicleOptions(vehicleData);
+        }
+    }, [vehicleData]);
 
     return (
         <div>
@@ -50,8 +24,8 @@ const VehicleOptionPanel = ({ setVehiclePanel, confirmVehicle, setConfirmVehicle
                         key={index}
                         className='flex bg-white w-full p-1 border-2 border-gray-400 active:border-black rounded-xl mb-2'
                         onClick={() => {
-                            setConfirmVehicle(option);
-                            setVehiclePanel(false);
+                            // Handle vehicle selection here, for example:
+                            setStatus(`Selected ${option.type}`);
                         }}
                     >
                         <div className='w-[35%]'>
@@ -78,9 +52,10 @@ const VehicleOptionPanel = ({ setVehiclePanel, confirmVehicle, setConfirmVehicle
                                 </div>
                                 <h4 className='font-extralight text-sm'>{option.seats} Seats</h4>
                                 <h4 className='font-extralight text-sm'>{option.distance}</h4>
+                                <h4 className='font-extralight text-sm'>{option.timeTaken}</h4> {/* Display time taken */}
                             </div>
                             <div className='w-1/4 text-center'>
-                                <h4 className='font-medium text-lg'>₹ {option.price}</h4>
+                                <h4 className='font-sm text-sm'>₹ {option.price}</h4>
                             </div>
                         </div>
                     </div>
@@ -88,7 +63,7 @@ const VehicleOptionPanel = ({ setVehiclePanel, confirmVehicle, setConfirmVehicle
                 <button
                     className='bg-black text-white rounded-lg p-2'
                     onClick={() => {
-                        setVehiclePanel(false);
+                        window.location.reload(); // Reload the page
                     }}
                 >
                     Cancel

@@ -1,0 +1,5 @@
+choose vehicle - backend data required -
+different prices of car,bike and auto
+total distance
+total time taken by each vehicle
+

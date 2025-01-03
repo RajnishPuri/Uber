@@ -3,7 +3,10 @@ import SearchingMap from './SearchingMap';
 import UserHomeMap from './UserHomeMap';
 import WaitingForPickup from './WaitingForPickup';
 import Uber_Logo_Black from '/Uber_Logo_Black.png';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { Locate } from 'lucide-react';
+import VehicleOptionPanel from '../components/VehicleOptionpanel';
+
 
 const UserHome = () => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -17,12 +20,31 @@ const UserHome = () => {
         lat: 40.7128,
         lng: -74.0060,
     });
+    const [vehicleData, setVehicleData] = useState({});
+    const mapRef = useRef(null); // Reference for the map container
+    const mapInstance = useRef(null); // Store map instance
 
-    function submitHandler(e) {
+    async function submitHandler(e) {
         e.preventDefault();
         console.log("Pickup:", pickup, "Destination:", destination);
-        setStatus('searching');
+        const Response = await fetch('http://localhost:3000/api/v1/ride/initialize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ pickup, destination }),
+        });
+        const data = await Response.json();
+        // console.log(data);
+        setVehicleData(data);
+        setStatus('showvehicleoptions');
+        setPickup('');
+        setDestination('');
+        setIsExpanded(false);
     }
+
+
+
 
     const togglePanel = (e) => {
         e.preventDefault();
@@ -37,27 +59,29 @@ const UserHome = () => {
         setCurrentLocation(newLocation);
     };
 
-    const formSubmitHandler = (e) => {
-        e.preventDefault();
-        console.log("Pickup:", pickup, "Destination:", destination);
-    };
-
     const fetchSuggestions = async (input, type) => {
         try {
             const response = await fetch(`http://localhost:3000/api/v1/maps/autocomplete?input=${input}`);
             const data = await response.json();
-            console.log('API Response:', data);
 
+            // Handle no suggestions found
             const suggestions = data.suggestions || [];
             if (type === 'pickup') {
                 setPickupSuggestions(suggestions);
             } else {
                 setDestinationSuggestions(suggestions);
             }
+
+            // Optionally handle case when no suggestions are returned
+            if (suggestions.length === 0) {
+                alert('No suggestions found for this location.');
+            }
         } catch (error) {
             console.error('Error fetching suggestions:', error);
+            alert('Failed to fetch suggestions, please try again later.');
         }
     };
+
 
     const handleInputChange = (e, type) => {
         const value = e.target.value;
@@ -80,6 +104,26 @@ const UserHome = () => {
         }
     };
 
+
+    const handleUseCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const location = `Lat: ${latitude}, Lng: ${longitude}`;
+                    setPickup(location);
+                    setCurrentLocation({ lat: latitude, lng: longitude });
+                    console.log('Current Location:', location);
+                },
+                (error) => {
+                    console.error('Error fetching location:', error);
+                }
+            );
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
+    };
+
     return (
         <div className="relative h-screen overflow-hidden">
             {/* Uber Logo */}
@@ -97,117 +141,122 @@ const UserHome = () => {
                         :
                         status === 'riding' ?
                             <Riding />
-                            : <SearchingMap />
+                            : <SearchingMap currentLocation={currentLocation} setCurrentLocation={setCurrentLocation} pickup={pickup} destination={destination} vehicleData={vehicleData} />
                 }
             </div>
 
             {/* Bottom Panel */}
             {/* DriverInfoForPickup - jab driver pick krne aayega toh otp ke sath driver ka info, RidingData - jab ride start hoga toh ride ka data, searching - jab ride initialize kiya hoga toh searching map aaega */}
-            {status === '' ? (
-                <div
-                    className={`absolute bottom-0 w-full bg-white z-10 transition-all duration-300 ${isExpanded ? 'h-screen' : 'h-[25%]'} flex flex-col `}
-                >
+            <div
+                className={`absolute bottom-0 w-full bg-white z-10 transition-all duration-300 ${isExpanded ? 'h-screen' : 'h-fit'} flex flex-col `}
+            >
+                {status === '' ? (
+                    <div className="flex flex-col h-full">
 
-                    {/* Header for Expanded View */}
-                    <div>
-                        <h3 className="text-lg font-bold px-4 py-2">Find Your Ride</h3>
-                        {/* Form */}
-                        <form
-                            className="flex flex-col gap-4 px-4 py-4"
-                            onSubmit={formSubmitHandler}
-                        >
-                            <input
-                                type="text"
-                                placeholder="Add Pickup Location"
-                                className="bg-gray-200 px-4 py-2 rounded-lg"
-                                value={pickup}
-                                aria-label="Pickup Location"
-                                onFocus={() => {
-                                    setIsExpanded(true);
-                                    setIsPickupFocused(true);
-                                }}
-                                onChange={(e) => handleInputChange(e, 'pickup')}
-                            />
+                        {/* Header for Expanded View */}
+                        <div>
+                            <h3 className="text-lg font-bold px-4 py-2">Find Your Ride</h3>
+                            {/* Form */}
+                            <form
+                                className="flex flex-col gap-4 px-4 py-4"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Add Pickup Location"
+                                        className="bg-gray-200 px-4 py-2 rounded-lg flex-grow"
+                                        value={pickup}
+                                        onFocus={() => {
+                                            setIsExpanded(true);
+                                            setIsPickupFocused(true);
+                                        }}
+                                        onChange={(e) => handleInputChange(e, 'pickup')}
+                                    />
+                                    <Locate onClick={handleUseCurrentLocation} className="w-8 h-8 cursor-pointer" />
 
-                            <input
-                                type="text"
-                                placeholder="Add Drop Location"
-                                className="bg-gray-200 px-4 py-2 rounded-lg"
-                                value={destination}
-                                aria-label="Drop Location"
-                                onFocus={() => {
-                                    setIsExpanded(true);
-                                    setIsPickupFocused(false);
-                                }}
-                                onChange={(e) => handleInputChange(e, 'destination')}
-                            />
+                                </div>
 
-                            {isExpanded && (
-                                <div className="flex justify-between">
-                                    <button
-                                        className="bg-black text-white px-8 py-2 rounded-lg"
-                                        onClick={submitHandler}
-                                    >
-                                        Find a Trip
-                                    </button>
-                                    <button
-                                        className="bg-gray-200 px-8 py-2 rounded-lg"
-                                        onClick={togglePanel}
-                                    >
-                                        Cancel
-                                    </button>
+                                <input
+                                    type="text"
+                                    placeholder="Add Drop Location"
+                                    className="bg-gray-200 px-4 py-2 rounded-lg"
+                                    value={destination}
+                                    aria-label="Drop Location"
+                                    onFocus={() => {
+                                        setIsExpanded(true);
+                                        setIsPickupFocused(false);
+                                    }}
+                                    onChange={(e) => handleInputChange(e, 'destination')}
+                                />
+
+                                {isExpanded && (
+                                    <div className="flex justify-between">
+                                        <button
+                                            className="bg-black text-white px-8 py-2 rounded-lg"
+                                            onClick={submitHandler}
+                                        >
+                                            Find a Trip
+                                        </button>
+                                        <button
+                                            className="bg-gray-200 px-8 py-2 rounded-lg"
+                                            onClick={togglePanel}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                )}
+                            </form>
+                        </div>
+                        <div className='h-full'>
+                            {isPickupFocused && pickupSuggestions.length > 0 && (
+                                <div className="bg-white shadow-md rounded-lg h-full overflow-y-auto">
+                                    {pickupSuggestions.map((suggestion, index) => (
+                                        <div
+                                            key={suggestion.place_id || index} // Ensure a unique key
+                                            className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                                            onClick={() => {
+                                                handleSuggestionClick(suggestion, 'pickup')
+                                                console.log(suggestion);
+                                            }}
+                                        >
+                                            {suggestion.description || 'No description available'} {/* Adjust if needed */}
+                                        </div>
+                                    ))}
                                 </div>
                             )}
-                        </form>
-                    </div>
-                    <div className='h-full'>
-                        {isPickupFocused && pickupSuggestions.length > 0 && (
-                            <div className="bg-white shadow-md rounded-lg h-full overflow-y-auto">
-                                {pickupSuggestions.map((suggestion, index) => (
-                                    <div
-                                        key={suggestion.place_id || index} // Ensure a unique key
-                                        className="px-4 py-2 cursor-pointer hover:bg-gray-200"
-                                        onClick={() => {
-                                            handleSuggestionClick(suggestion, 'pickup')
-                                            console.log(suggestion);
-                                        }}
-                                    >
-                                        {suggestion.description || 'No description available'} {/* Adjust if needed */}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
 
-                        {!isPickupFocused && destinationSuggestions.length > 0 && (
-                            <div className="bg-white shadow-md rounded-lg h-full overflow-y-auto">
-                                {destinationSuggestions.map((suggestion, index) => (
-                                    <div
-                                        key={suggestion.place_id || index} // Ensure a unique key
-                                        className="px-4 py-2 cursor-pointer hover:bg-gray-200"
-                                        onClick={() => handleSuggestionClick(suggestion, 'destination')}
-                                    >
-                                        {suggestion.description || 'No description available'} {/* Adjust if needed */}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                            {!isPickupFocused && destinationSuggestions.length > 0 && (
+                                <div className="bg-white shadow-md rounded-lg h-full overflow-y-auto">
+                                    {destinationSuggestions.map((suggestion, index) => (
+                                        <div
+                                            key={suggestion.place_id || index} // Ensure a unique key
+                                            className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                                            onClick={() => handleSuggestionClick(suggestion, 'destination')}
+                                        >
+                                            {suggestion.description || 'No description available'} {/* Adjust if needed */}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
 
+
+                        </div>
 
                     </div>
-
-                </div>
-            ) : status === 'searching' ?
-                (<div>
-                    <div className="flex flex-col items-center justify-center h-screen">
-                        <div className="text-4xl font-bold mb-4">Searching for a trip...</div>
-                        <div className="text-gray-600">Please wait while we find the perfect trip for you.</div>
+                ) : status === 'searching' ?
+                    (<div>
+                        <div className="flex flex-col items-center justify-center h-screen">
+                            <div className="text-4xl font-bold mb-4">Searching for a trip...</div>
+                            <div className="text-gray-600">Please wait while we find the perfect trip for you.</div>
+                        </div>
                     </div>
-                </div>
-                ) :
-                status === 'waitingforpickup' ? (<DriverInfoForPickup />) :
-                    status === 'riding' ? (<RidingData />) : null
-            }
+                    ) :
+                    status === 'waitingforpickup' ? (<DriverInfoForPickup />) :
+                        status === 'riding' ? (<RidingData />) :
+                            status === 'showvehicleoptions' ? (<VehicleOptionPanel vehicleData={vehicleData} setVehicleData={setVehicleData} status={status} setStatus={setStatus} />) : null
+                }
+            </div>
         </div>
     );
 };
