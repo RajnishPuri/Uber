@@ -23,11 +23,9 @@ const PilotLogin = () => {
             if (response.data.success) {
                 alert(response.data.message || 'Pilot Logged In Successfully');
 
-                // Save token and role in localStorage
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('role', response.data.role);
 
-                // Map response to match the state structure
                 const formattedPilot = {
                     fullName: {
                         firstName: response.data.pilot.fullName?.firstName || "",
@@ -51,14 +49,12 @@ const PilotLogin = () => {
                 localStorage.setItem('vehicleCapacity', response.data.pilot.vehicle?.capacity);
                 localStorage.setItem('_id', response.data.pilot._id);
 
-                // Update the context state
+
                 setPilot(formattedPilot);
 
-                // Reset form fields
                 setEmail('');
                 setPassword('');
 
-                // Navigate to the pilot home page
                 navigate('/pilothome');
             } else {
                 alert('Login failed. Please try again.');

@@ -7,7 +7,7 @@ import Uber_Bike from '/Uber_Bike.jpg';
 import Uber_Auto from '/Uber_Auto.jpg';
 import ConfirmVehicle from "./ConfirmVehicle";
 
-// const socket = io("http://localhost:3000"); // Replace with your backend URL
+// const socket = io("http://localhost:3000"); 
 
 const VehicleOptionPanel = ({ vehicleData, pickup, destination, status, setStatus }) => {
     const [vehicleOptions, setVehicleOptions] = useState(vehicleData.vehicleDetails || []);
@@ -18,7 +18,7 @@ const VehicleOptionPanel = ({ vehicleData, pickup, destination, status, setStatu
     const [rideData, setRideData] = useState(null);
 
     const clickHandler = async (option) => {
-        setLoading(true); // Show loader
+        setLoading(true);
         const distance = parseFloat(option.distance.split(' ')[0]);
 
         try {
@@ -123,7 +123,7 @@ const VehicleOptionPanel = ({ vehicleData, pickup, destination, status, setStatu
                     <button
                         className='bg-black text-white rounded-lg p-2'
                         onClick={() => {
-                            window.location.reload(); // Reload the page
+                            window.location.reload();
                         }}
                     >
                         Cancel

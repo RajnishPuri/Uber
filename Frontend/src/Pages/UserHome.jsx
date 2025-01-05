@@ -24,8 +24,8 @@ const UserHome = () => {
         lng: -74.0060,
     });
     const [vehicleData, setVehicleData] = useState({});
-    const mapRef = useRef(null); // Reference for the map container
-    const mapInstance = useRef(null); // Store map instance
+    const mapRef = useRef(null);
+    const mapInstance = useRef(null);
     const { sendMessage, receiveMessage, socket } = useContext(SocketContext);
     const { user, setUser } = useContext(UserDataContext);
 
@@ -50,26 +50,24 @@ const UserHome = () => {
     }
 
     useEffect(() => {
-        // Retrieve user data from localStorage when the component mounts
         const formattedUser = {
             fullName: {
                 firstName: localStorage.getItem('firstName') || "",
                 lastName: localStorage.getItem('lastName') || "",
             },
             email: localStorage.getItem('email') || "",
-            _id: localStorage.getItem('userId') || "",  // Use 'userId' as stored in localStorage
+            _id: localStorage.getItem('userId') || "",
         };
 
         setUser(formattedUser);
     }, [setUser]);
 
     useEffect(() => {
-        // Send the message only after the user state has been updated
         if (user._id) {
             console.log("Sending message with user ID:", user._id);
             sendMessage('join', { userType: "user", userId: user._id });
         }
-    }, [user]); // This effect runs when the user state changes
+    }, [user]);
 
 
 
@@ -93,7 +91,6 @@ const UserHome = () => {
             const response = await fetch(`http://localhost:3000/api/v1/maps/autocomplete?input=${input}`);
             const data = await response.json();
 
-            // Handle no suggestions found
             const suggestions = data.suggestions || [];
             if (type === 'pickup') {
                 setPickupSuggestions(suggestions);
@@ -101,7 +98,6 @@ const UserHome = () => {
                 setDestinationSuggestions(suggestions);
             }
 
-            // Optionally handle case when no suggestions are returned
             if (suggestions.length === 0) {
                 alert('No suggestions found for this location.');
             }
@@ -155,10 +151,9 @@ const UserHome = () => {
 
     return (
         <div className="relative h-screen overflow-hidden">
-            {/* Uber Logo */}
+
             <img className="w-20 absolute left-5 top-5" src={Uber_Logo_Black} alt="Uber Logo" />
 
-            {/* Map Section */}
             {/* UserHomeMap - sabse pehle khud ka location map par dikh rha hoga , WaitingForPickup - jab driver aa rha hoga tab ka map, riding - ride start ho chuka hoga, SearchingMap - jab search kar rha hoga tab ka map */}
             <div className="h-[calc(100%-80px)] w-full z-0">
                 {status === '' ?
@@ -174,7 +169,6 @@ const UserHome = () => {
                 }
             </div>
 
-            {/* Bottom Panel */}
             {/* DriverInfoForPickup - jab driver pick krne aayega toh otp ke sath driver ka info, RidingData - jab ride start hoga toh ride ka data, searching - jab ride initialize kiya hoga toh searching map aaega */}
             <div
                 className={`absolute bottom-0 w-full bg-white z-10 transition-all duration-300 ${isExpanded ? 'h-screen' : 'h-fit'} flex flex-col `}
@@ -241,14 +235,14 @@ const UserHome = () => {
                                 <div className="bg-white shadow-md rounded-lg h-full overflow-y-auto">
                                     {pickupSuggestions.map((suggestion, index) => (
                                         <div
-                                            key={suggestion.place_id || index} // Ensure a unique key
+                                            key={suggestion.place_id || index}
                                             className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                                             onClick={() => {
                                                 handleSuggestionClick(suggestion, 'pickup')
 
                                             }}
                                         >
-                                            {suggestion.description || 'No description available'} {/* Adjust if needed */}
+                                            {suggestion.description || 'No description available'}
                                         </div>
                                     ))}
                                 </div>
@@ -258,11 +252,11 @@ const UserHome = () => {
                                 <div className="bg-white shadow-md rounded-lg h-full overflow-y-auto">
                                     {destinationSuggestions.map((suggestion, index) => (
                                         <div
-                                            key={suggestion.place_id || index} // Ensure a unique key
+                                            key={suggestion.place_id || index}
                                             className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                                             onClick={() => handleSuggestionClick(suggestion, 'destination')}
                                         >
-                                            {suggestion.description || 'No description available'} {/* Adjust if needed */}
+                                            {suggestion.description || 'No description available'}
                                         </div>
                                     ))}
                                 </div>

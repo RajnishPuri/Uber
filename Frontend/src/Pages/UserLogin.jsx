@@ -21,10 +21,8 @@ const UserLogin = () => {
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/login`, newUserData);
             alert('User Logged In Successfully');
 
-            // Log the response to debug
             console.log('Response Data:', response.data);
 
-            // Format and update user
             const formattedUser = {
                 fullName: {
                     firstName: response.data.user.fullName?.firstName || "",

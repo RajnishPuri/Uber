@@ -13,7 +13,6 @@ const PilotAllRides = ({ currentRide, setCurrentRide, rides, setRides, status, s
     // Handle Accept
     const handleAccept = async (id) => {
         try {
-            // Send the POST request to confirm the ride
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_URL}/ride/confirm-ride/${id}`,
                 {},
@@ -25,14 +24,13 @@ const PilotAllRides = ({ currentRide, setCurrentRide, rides, setRides, status, s
                 }
             );
 
-            // Check if the response is successful
+
             if (response.status === 200) {
                 console.log(response.data);
 
-                // Update local state based on the response
                 setRideId(id);
-                setStatus("picking"); // Ensure the status is set to "picking"
-                setCurrentRide(response.data.ride); // Set the current ride after acceptance
+                setStatus("picking");
+                setCurrentRide(response.data.ride);
                 console.log(`Ride with ID ${id} accepted.`);
             } else {
                 console.error("Failed to accept the ride:", response.data.message || "Unknown error");
@@ -42,15 +40,13 @@ const PilotAllRides = ({ currentRide, setCurrentRide, rides, setRides, status, s
         }
     };
 
-    // Handle Reject
     const handleReject = (id) => {
         setRides(rides.filter((ride) => ride._id !== id));
         console.log(`Ride with ID ${id} rejected.`);
     };
 
-    // Handle End Ride
     const endRide = (id) => {
-        setCurrentRide(null); // Reset currentRide to null
+        setCurrentRide(null);
         setStatus("");
         setRides(rides.filter((ride) => ride._id !== rideId));
         console.log(`Ride with ID ${id} ended.`);
@@ -69,7 +65,7 @@ const PilotAllRides = ({ currentRide, setCurrentRide, rides, setRides, status, s
             },
         });
         console.log(Response);
-        setStatus("dropping"); // Change status to "dropping" after successful OTP submission
+        setStatus("dropping");
     }
 
     useEffect(() => {

@@ -35,18 +35,18 @@ const PilotHome = () => {
     const [isRidingConfirmed, setIsRidingConfirmed] = useState(false);
     const [isActive, setIsActive] = useState(false);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
-    // const socket = io('https://your-backend-server.com'); // Connect to backend server
+    // const socket = io('https://your-backend-server.com'); 
 
-    // Toggle the state (active/inactive)
+
     const toggleStatus = async () => {
         setIsActive(prevState => !prevState);
 
-        // Send the updated status to the backend
+
         // await socket.emit('update-pilot-status', {
         //     isActive: !isActive
         // });
 
-        // // Optionally, you can handle the response from the backend
+
         // socket.on('status-updated', (data) => {
         //     console.log('Pilot status updated:', data);
         // });
@@ -61,7 +61,7 @@ const PilotHome = () => {
     };
 
     useEffect(() => {
-        // Retrieve pilot data from localStorage when the component mounts
+
         const formattedPilot = {
             fullName: {
                 firstName: localStorage.getItem('firstName') || "",
@@ -72,7 +72,7 @@ const PilotHome = () => {
             vehicleNumber: localStorage.getItem('vehicleNumber') || "",
             vehicleType: localStorage.getItem('vehicleType') || "",
             vehicleCapacity: localStorage.getItem('vehicleCapacity') || "",
-            _id: localStorage.getItem('userId') || "",  // Use 'userId' as stored in localStorage
+            _id: localStorage.getItem('userId') || "",
         };
 
         setPilot(formattedPilot);
@@ -80,7 +80,7 @@ const PilotHome = () => {
     }, [setPilot]);
 
     useEffect(() => {
-        // Send the message only after the pilot state has been updated
+
         if (pilot._id) {
             console.log("Sending message with pilot ID:", pilot._id);
             sendMessage('join', { userType: "pilot", userId: pilot._id });
@@ -109,24 +109,24 @@ const PilotHome = () => {
             }
         };
 
-        // Set up interval to update location every 5 seconds
+
         const locationInterval = setInterval(updateLocation, 5000);
 
-        // Update location immediately
+
         updateLocation();
 
-        // Cleanup interval on component unmount
+
         return () => clearInterval(locationInterval);
     }, [socket, pilot]);
 
     useEffect(() => {
-        // Setup the socket event listener only once
+
         const handleNewRide = (data) => {
             console.log("Received new ride:", data);
 
-            // Check if data already exists in the rides array to prevent duplicates
+
             setRides((prevRides) => {
-                // Check if this ride is already in the array
+
                 if (!prevRides.some((ride) => ride._id === data._id)) {
                     return [...prevRides, data];
                 }
@@ -136,7 +136,6 @@ const PilotHome = () => {
 
         socket.on('new-ride', handleNewRide);
 
-        // Cleanup: Remove the event listener when the component unmounts
         return () => {
             socket.off('new-ride', handleNewRide);
         };
@@ -146,13 +145,13 @@ const PilotHome = () => {
 
     return (
         <div className="relative h-screen overflow-hidden">
-            {/* Logo */}
+
             <div>
                 <div className="absolute z-10 left-1/2 transform -translate-x-1/2 top-2 ">
                     <img className="w-20" src={Uber_Logo} alt="Uber Logo" />
                 </div>
 
-                {/* Menu Icon */}
+
                 <div className="absolute z-10 left-5 top-4">
                     <Menu
                         className="w-8 h-8 text-white cursor-pointer"
@@ -166,7 +165,7 @@ const PilotHome = () => {
                         className={`relative w-10 h-5 rounded-full cursor-pointer transition-all duration-300 ${isActive ? 'bg-green-600' : 'bg-gray-400'
                             }`}
                     >
-                        {/* The ball */}
+
                         <div
                             className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-white transition-all duration-300 ${isActive ? 'translate-x-5' : 'translate-x-0'
                                 }`}
@@ -175,11 +174,9 @@ const PilotHome = () => {
                 </div>
 
 
-                {/* Navbar */}
                 <div className="absolute top-0 z-5 w-full h-16 bg-black opacity-100"></div>
             </div>
 
-            {/* Sidebar Menu */}
             <div
                 className={`fixed top-0 left-0 h-full w-3/4 bg-white shadow-lg transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'
                     } transition-transform duration-300 ease-in-out z-50`}
@@ -199,9 +196,8 @@ const PilotHome = () => {
                 </ul>
             </div>
 
-            {/* Main Content */}
             <div className="h-[calc(100%-64px)] mt-16 relative z-1">
-                {currentRide === null ? ( // Explicitly check for null (no ride)
+                {currentRide === null ? (
                     <PilotHomeMap
                         currentLocation={currentLocation}
                         setCurrentLocation={handleLocationChange}
@@ -213,13 +209,11 @@ const PilotHome = () => {
                 ) : null}
             </div>
 
-
-            {/* available trips */}
             <div
                 className={`fixed bottom-0 w-full bg-white shadow-lg transform transition-transform duration-300 z-30 ${isPanelOpen ? 'translate-y-0' : 'translate-y-[calc(100%-50px)]'
                     }`}
                 style={{
-                    height: isPanelOpen ? 'calc(100vh - 64px)' : '50px', // Open: full height minus navbar; Closed: small visible strip
+                    height: isPanelOpen ? 'calc(100vh - 64px)' : '50px',
                 }}
             >
                 <div
