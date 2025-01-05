@@ -57,21 +57,17 @@ function initializeSocket(server) {
                 const { userId, location } = data;
                 const { lat, lng } = location;
 
-                // Validate latitude and longitude
                 if (typeof lat !== 'number' || typeof lng !== 'number') {
                     return socket.emit('error', { message: 'Invalid latitude or longitude' });
                 }
 
-                // Find the pilot
                 const pilot = await Pilot.findById(userId);
                 if (!pilot) {
                     return socket.emit('error', { message: 'Pilot not found' });
                 }
-
-                // Update pilot's location in GeoJSON format
                 pilot.location = {
                     type: 'Point',
-                    coordinates: [lng, lat] // GeoJSON requires [longitude, latitude]
+                    coordinates: [lng, lat]
                 };
 
                 await pilot.save();
@@ -88,7 +84,6 @@ function initializeSocket(server) {
         socket.on('disconnect', async () => {
             try {
                 console.log(`User disconnected: ${socket.id}`);
-                // Optionally, remove the `socketId` from the database
                 await User.updateMany({ socketId: socket.id }, { $unset: { socketId: '' } });
                 await Pilot.updateMany({ socketId: socket.id }, { $unset: { socketId: '' } });
             } catch (error) {

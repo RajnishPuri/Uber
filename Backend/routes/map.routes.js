@@ -6,7 +6,6 @@ const { query } = require('express-validator');
 
 const mapRouter = express.Router();
 
-// Route to get coordinates from an address
 mapRouter.get('/get-coordinates',
     query('address').isString().isLength({ min: 3 }).withMessage('Address is required'),
     authMiddleware, getCoordinates);

@@ -2,14 +2,13 @@ const { getAddressCoordinate, getDrivingDistance, getAutoCompleteSuggestions } =
 
 const { validationResult } = require('express-validator');
 
-// Controller to handle address-to-coordinate requests
 exports.getCoordinates = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { address } = req.query; // Expecting the address in the query string
+    const { address } = req.query;
 
     if (!address) {
         return res.status(400).json({ error: 'Address is required' });
@@ -23,13 +22,11 @@ exports.getCoordinates = async (req, res) => {
     }
 };
 
-// Function to calculate the distance between two coordinates
 
 
 exports.getDrivingDistanceWithCoordinatesParams = async (req, res) => {
     const { lat1, lon1, lat2, lon2 } = req.query;
 
-    // Check if all coordinates are provided
     if (!lat1 || !lon1 || !lat2 || !lon2) {
         return res.status(400).json({
             success: false,
@@ -42,7 +39,6 @@ exports.getDrivingDistanceWithCoordinatesParams = async (req, res) => {
         const destination = `${lat2},${lon2}`;
         const result = await getDrivingDistance(origin, destination);
 
-        // Return the result with converted values
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({

@@ -59,19 +59,19 @@ const pilotSchema = new mongoose.Schema({
     location: {
         type: {
             type: String,
-            enum: ['Point'], // Must be 'Point'
+            enum: ['Point'],
             required: true,
             default: 'Point'
         },
         coordinates: {
-            type: [Number], // Array of [longitude, latitude]
+            type: [Number],
             required: true,
             default: [0, 0]
         }
     }
 });
 
-// Add a 2dsphere index on the location field for geospatial queries
+
 pilotSchema.index({ location: '2dsphere' });
 
 pilotSchema.methods.generateAuthToken = function () {

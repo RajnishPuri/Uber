@@ -41,8 +41,8 @@ exports.initializeRide = async (req, res) => {
             console.log('Destination coordinates:', destinationCoordinates);
 
             const { latitude, longitude } = destinationCoordinates;
-            console.log(latitude); // 25.5940947
-            console.log(longitude); // 85.1375645
+            console.log(latitude);
+            console.log(longitude);
 
 
             const lat1 = pickupCoordinates[0];
@@ -59,18 +59,18 @@ exports.initializeRide = async (req, res) => {
                 { type: 'Auto', speed: 50, pricePerKm: 1, seats: 3 },
             ];
 
-            // Calculate price and time for each vehicle type
-            const vehicleDetails = vehicles.map(vehicle => {
-                const timeTakenInHours = (distanceData.rawDistance / 1000) / vehicle.speed; // time in hours
-                const hours = Math.floor(timeTakenInHours); // Whole hours
-                const minutes = Math.round((timeTakenInHours - hours) * 60); // Convert decimal part to minutes
 
-                const price = (distanceData.rawDistance / 1000) * vehicle.pricePerKm; // price in currency units
+            const vehicleDetails = vehicles.map(vehicle => {
+                const timeTakenInHours = (distanceData.rawDistance / 1000) / vehicle.speed;
+                const hours = Math.floor(timeTakenInHours);
+                const minutes = Math.round((timeTakenInHours - hours) * 60);
+
+                const price = (distanceData.rawDistance / 1000) * vehicle.pricePerKm;
 
                 return {
                     type: vehicle.type,
                     distance: distanceData.distanceInKm,
-                    timeTaken: `${hours} hours ${minutes} mins`, // Formatted as hours and minutes
+                    timeTaken: `${hours} hours ${minutes} mins`,
                     price: `${price.toFixed(2)}`,
                     duration: distanceData.duration,
                     seats: vehicle.seats,
@@ -78,7 +78,6 @@ exports.initializeRide = async (req, res) => {
             });
 
 
-            // Log the details for each vehicle
             console.log('Vehicle Options:', vehicleDetails);
 
             return res.status(200).json({
@@ -93,20 +92,17 @@ exports.initializeRide = async (req, res) => {
             const pickupCoordinates = await getAddressCoordinate(pickup);
             console.log('Pickup coordinates:', pickupCoordinates);
 
-            // Destructure and rename the properties for pickup coordinates
             const { latitude: pickupLatitude, longitude: pickupLongitude } = pickupCoordinates;
-            console.log('Pickup Latitude:', pickupLatitude); // e.g., 25.5940947
-            console.log('Pickup Longitude:', pickupLongitude); // e.g., 85.1375645
+            console.log('Pickup Latitude:', pickupLatitude);
+            console.log('Pickup Longitude:', pickupLongitude);
 
             const destinationCoordinates = await getAddressCoordinate(destination);
             console.log('Destination coordinates:', destinationCoordinates);
 
-            // Destructure and rename the properties for destination coordinates
             const { latitude: destinationLatitude, longitude: destinationLongitude } = destinationCoordinates;
-            console.log('Destination Latitude:', destinationLatitude); // e.g., 25.5940947
-            console.log('Destination Longitude:', destinationLongitude); // e.g., 85.1375645
+            console.log('Destination Latitude:', destinationLatitude);
+            console.log('Destination Longitude:', destinationLongitude);
 
-            // Assigning coordinates to variables for use in the distance calculation
             const lat1 = pickupLatitude;
             const lon1 = pickupLongitude;
             const lat2 = destinationLatitude;
@@ -122,18 +118,17 @@ exports.initializeRide = async (req, res) => {
                 { type: 'Auto', speed: 50, pricePerKm: 1, seats: 3 },
             ];
 
-            // Calculate price and time for each vehicle type
             const vehicleDetails = vehicles.map(vehicle => {
-                const timeTakenInHours = (distanceData.rawDistance / 1000) / vehicle.speed; // time in hours
-                const hours = Math.floor(timeTakenInHours); // Whole hours
-                const minutes = Math.round((timeTakenInHours - hours) * 60); // Convert decimal part to minutes
+                const timeTakenInHours = (distanceData.rawDistance / 1000) / vehicle.speed;
+                const hours = Math.floor(timeTakenInHours);
+                const minutes = Math.round((timeTakenInHours - hours) * 60);
 
-                const price = (distanceData.rawDistance / 1000) * vehicle.pricePerKm; // price in currency units
+                const price = (distanceData.rawDistance / 1000) * vehicle.pricePerKm;
 
                 return {
                     type: vehicle.type,
                     distance: distanceData.distanceInKm,
-                    timeTaken: `${hours} hours ${minutes} mins`, // Formatted as hours and minutes
+                    timeTaken: `${hours} hours ${minutes} mins`,
                     price: `${price.toFixed(2)}`,
                     duration: distanceData.duration,
                     seats: vehicle.seats
@@ -141,7 +136,6 @@ exports.initializeRide = async (req, res) => {
             });
 
 
-            // Log the details for each vehicle
             console.log('Vehicle Options:', vehicleDetails);
 
 
@@ -164,7 +158,7 @@ exports.createRide = async (req, res) => {
         var pilotInRadius;
         const { type, pickup, destination, price, duration, distance, paymentMethod } = req.body;
 
-        // Regular expression to check if pickup is in coordinate format (Lat, Lng)
+
         const coordinateRegex = /^Lat: (-?[\d]{1,2}\.\d+), Lng: (-?[\d]{1,3}\.\d+)$/;
 
         const otp = Math.floor(1000 + Math.random() * 9000);
@@ -172,7 +166,7 @@ exports.createRide = async (req, res) => {
         let isCoordinate = coordinateRegex.test(pickup);
 
         if (isCoordinate) {
-            // Pickup is a coordinate, do another task
+
             const matches = pickup.match(coordinateRegex);
             const latitude = parseFloat(matches[1]);
             const longitude = parseFloat(matches[2]);
@@ -184,11 +178,10 @@ exports.createRide = async (req, res) => {
             console.log('Pilot in radius:', pilotInRadius);
 
 
-            // Do something special with the coordinates
-            // e.g., store in a different table, process location-based data, etc.
+
 
         } else {
-            // Pickup is an address, proceed as usual
+
             console.log(`Address received: ${pickup}`);
             const pickupCoordinates = await getAddressCoordinate(pickup);
             console.log(pickupCoordinates.latitude, pickupCoordinates.longitude);
@@ -198,7 +191,6 @@ exports.createRide = async (req, res) => {
 
 
 
-        // Create the ride object regardless of coordinate or address
         const ride = new Ride({
             pickup,
             destination,
@@ -243,9 +235,9 @@ exports.confirmRide = async (req, res) => {
     try {
         const ride = await confirmRide(rideId, pilotId);
         const rideDetail = await Ride.findById(rideId)
-            .populate('user')    // Populates the 'user' field with the corresponding User data
-            .populate('pilot')   // Populates the 'pilot' field with the corresponding Pilot data
-            .select('+otp')      // Explicitly selects the 'otp' field, as it is marked with 'select: false'
+            .populate('user')
+            .populate('pilot')
+            .select('+otp')
             .exec();
 
         console.log(rideDetail);

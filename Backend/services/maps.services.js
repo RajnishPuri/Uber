@@ -7,7 +7,6 @@ const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAP_API;
 
 exports.getAddressWithCoordinates = async (latitude, longitude) => {
     try {
-        // Validate coordinates
         if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
             throw new Error('Invalid latitude or longitude provided.');
         }
@@ -19,10 +18,9 @@ exports.getAddressWithCoordinates = async (latitude, longitude) => {
             },
         });
 
-        console.log('API Response:', response.data); // Debugging
+        console.log('API Response:', response.data);
 
         if (response.data.status === 'OK') {
-            // Return the nearest address
             const address = response.data.results[0].formatted_address;
             return address;
         } else if (response.data.status === 'ZERO_RESULTS') {
@@ -77,19 +75,17 @@ exports.getDrivingDistance = async (origin, destination) => {
         if (response.data.status === 'OK') {
             const result = response.data.rows[0].elements[0];
             if (result.status === 'OK') {
-                // Convert raw distance from meters to kilometers
-                const distanceInKm = (result.distance.value / 1000).toFixed(2); // km
-                // Convert raw duration from seconds to hours
-                const durationInHours = (result.duration.value / 3600).toFixed(2); // hours
+                const distanceInKm = (result.distance.value / 1000).toFixed(2);
+                const durationInHours = (result.duration.value / 3600).toFixed(2);
 
                 return {
                     success: true,
-                    distance: result.distance.text, // Distance in human-readable format (e.g., "10.5 km")
-                    duration: result.duration.text, // Duration in human-readable format (e.g., "12 mins")
-                    rawDistance: result.distance.value, // Distance in meters
-                    rawDuration: result.duration.value, // Duration in seconds
-                    distanceInKm: `${distanceInKm} km`, // Converted distance in km
-                    durationInHours: `${durationInHours} hr`, // Converted duration in hours
+                    distance: result.distance.text,
+                    duration: result.duration.text,
+                    rawDistance: result.distance.value,
+                    rawDuration: result.duration.value,
+                    distanceInKm: `${distanceInKm} km`,
+                    durationInHours: `${durationInHours} hr`,
                 };
             } else {
                 throw new Error(`Route calculation failed: ${result.status}`);
@@ -105,7 +101,6 @@ exports.getDrivingDistance = async (origin, destination) => {
 
 exports.getAutoCompleteSuggestions = async (input) => {
     try {
-        // Make a request to the Google Places API for autocomplete suggestions
         const response = await axios.get('https://maps.googleapis.com/maps/api/place/autocomplete/json', {
             params: {
                 input: input,
@@ -113,7 +108,6 @@ exports.getAutoCompleteSuggestions = async (input) => {
             },
         });
 
-        // Check if the API returns predictions
         if (response.data.status === 'OK') {
             return {
                 success: true,
@@ -130,7 +124,6 @@ exports.getAutoCompleteSuggestions = async (input) => {
 
 exports.getPilotInTheRadius = async (latitude, longitude, radius) => {
     try {
-        // Query pilots within the specified radius
         const pilots = await Pilot.find({
             location: {
                 $geoWithin: {
