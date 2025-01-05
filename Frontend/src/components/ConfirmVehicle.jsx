@@ -2,11 +2,12 @@ import Uber_Car from '/Uber_Car.jpg';
 import Uber_Bike from '/Uber_Bike.jpg';
 import Uber_Auto from '/Uber_Auto.jpg';
 import { MapPin, CreditCard, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import DriverFound from './DriverFound';
 import Uber_Driver from '/Uber_Driver.png';
+import { SocketContext } from '../Context/SocketContext';
 
-const ConfirmVehicle = ({ rideData }) => {
+const ConfirmVehicle = ({ rideData, status, setStatus }) => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [isLookingForDriver, setIsLookingForDriver] = useState(false);
     const [driverData, setDriverData] = useState(null);
@@ -17,7 +18,14 @@ const ConfirmVehicle = ({ rideData }) => {
         setIsHidden((prev) => !prev);
     };
 
+    const { sendMessage, receiveMessage, socket } = useContext(SocketContext);
 
+    useEffect(() => {
+        socket.on('ride-confirmed', (data, otp) => {
+            console.log('Ride confirmed:', data);
+            setDriverData(data);
+        });
+    })
 
     const driverDetailDemo = {
         name: 'John Doe',
@@ -100,8 +108,7 @@ const ConfirmVehicle = ({ rideData }) => {
 
                     {isLookingForDriver ? (
                         driverData ? (
-                            <></>
-                            // <DriverFound driverData={driverData} setConfirmVehicle={setConfirmVehicle} setDriverData={setDriverData} setIsRiding={setIsRiding} setIsRidingConfirmed={setIsRidingConfirmed} isRidingConfirmed={isRidingConfirmed} isRiding={isRiding} />
+                            <DriverFound driverData={driverData} />
                         ) : (
                             <div className="flex flex-col items-center justify-center gap-4 mt-4">
                                 <div className="loader border-4 border-t-green-600 border-gray-300 rounded-full w-12 h-12 animate-spin"></div>

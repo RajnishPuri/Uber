@@ -1,6 +1,42 @@
+const Pilot = require('../models/pilot.model');
+
 const axios = require('axios');
 
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAP_API;
+
+
+exports.getAddressWithCoordinates = async (latitude, longitude) => {
+    try {
+        // Validate coordinates
+        if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+            throw new Error('Invalid latitude or longitude provided.');
+        }
+
+        const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+            params: {
+                latlng: `${latitude},${longitude}`,
+                key: GOOGLE_MAPS_API_KEY,
+            },
+        });
+
+        console.log('API Response:', response.data); // Debugging
+
+        if (response.data.status === 'OK') {
+            // Return the nearest address
+            const address = response.data.results[0].formatted_address;
+            return address;
+        } else if (response.data.status === 'ZERO_RESULTS') {
+            throw new Error('No nearby address found for the given coordinates.');
+        } else if (response.data.status === 'REQUEST_DENIED') {
+            throw new Error('Request denied: Check your API key and billing settings.');
+        } else {
+            throw new Error(`Geocoding failed: ${response.data.status}`);
+        }
+    } catch (error) {
+        console.error(`Error fetching address:`, error.message);
+        return { success: false, error: 'Unable to fetch address coordinates.' };
+    }
+};
 
 
 exports.getAddressCoordinate = async (address) => {
@@ -89,5 +125,23 @@ exports.getAutoCompleteSuggestions = async (input) => {
     } catch (error) {
         console.error('Error fetching autocomplete suggestions:', error.message);
         throw new Error('Failed to fetch autocomplete suggestions.');
+    }
+};
+
+exports.getPilotInTheRadius = async (latitude, longitude, radius) => {
+    try {
+        // Query pilots within the specified radius
+        const pilots = await Pilot.find({
+            location: {
+                $geoWithin: {
+                    $centerSphere: [[longitude, latitude], radius / 6378.1],
+                },
+            },
+        });
+
+        return pilots;
+    } catch (error) {
+        console.error('Error fetching pilots in the radius:', error.message);
+        throw new Error('Failed to fetch pilots in the radius.');
     }
 };

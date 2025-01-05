@@ -44,6 +44,7 @@ exports.pilotAuthMiddleware = async (req, res, next) => {
             const decoded_token = jwt.verify(token, process.env.JWT_SECRET);
             const pilot = await Pilot.findById(decoded_token._id);
             req.pilot = pilot;
+            console.log("pilot : ", pilot);
             return next();
         } catch (error) {
             return res.status(401).json({ message: 'Invalid or expired token' });

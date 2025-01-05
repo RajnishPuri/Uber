@@ -9,7 +9,7 @@ import ConfirmVehicle from "./ConfirmVehicle";
 
 // const socket = io("http://localhost:3000"); // Replace with your backend URL
 
-const VehicleOptionPanel = ({ vehicleData, pickup, destination }) => {
+const VehicleOptionPanel = ({ vehicleData, pickup, destination, status, setStatus }) => {
     const [vehicleOptions, setVehicleOptions] = useState(vehicleData.vehicleDetails || []);
     const [loading, setLoading] = useState(false);
     const [rideId, setRideId] = useState(null);
@@ -129,7 +129,7 @@ const VehicleOptionPanel = ({ vehicleData, pickup, destination }) => {
                         Cancel
                     </button>
                 </div>
-            ) : (<ConfirmVehicle rideData={rideData} />)}
+            ) : (<ConfirmVehicle rideData={rideData} status={status} setStatus={setStatus} />)}
         </div>
     );
 };

@@ -15,20 +15,61 @@ const PilotLogin = () => {
     const formSubmit = async (e) => {
         e.preventDefault();
         try {
-            const newPilotData = { email: email, password: password };
+            const newPilotData = { email, password };
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/pilot/login`, newPilotData);
-            alert('Pilot Logged In Successfully');
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('role', response.data.role);
-            setPilot(response.data);
-            setEmail('');
-            setPassword('');
-            navigate('/pilothome');
-        }
-        catch (e) {
-            console.log(e);
+
+            console.log(response.data);
+
+            if (response.data.success) {
+                alert(response.data.message || 'Pilot Logged In Successfully');
+
+                // Save token and role in localStorage
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('role', response.data.role);
+
+                // Map response to match the state structure
+                const formattedPilot = {
+                    fullName: {
+                        firstName: response.data.pilot.fullName?.firstName || "",
+                        lastName: response.data.pilot.fullName?.lastName || ""
+                    },
+                    email: response.data.pilot.email || "",
+                    vehicleColor: response.data.pilot.vehicle?.color || "",
+                    vehicleNumber: response.data.pilot.vehicle?.plate || "",
+                    vehicleType: response.data.pilot.vehicle?.vehicleType || "",
+                    vehicleCapacity: response.data.pilot.vehicle?.capacity || "",
+                    _id: response.data.pilot._id || ""
+                };
+
+                localStorage.setItem('firstName', response.data.pilot.fullName?.firstName);
+                localStorage.setItem('lastName', response.data.pilot.fullName?.lastName);
+                localStorage.setItem('email', response.data.pilot.email);
+                localStorage.setItem('userId', response.data.pilot._id);
+                localStorage.setItem('vehicleColor', response.data.pilot.vehicle?.color);
+                localStorage.setItem('vehicleNumber', response.data.pilot.vehicle?.plate);
+                localStorage.setItem('vehicleType', response.data.pilot.vehicle?.vehicleType);
+                localStorage.setItem('vehicleCapacity', response.data.pilot.vehicle?.capacity);
+                localStorage.setItem('_id', response.data.pilot._id);
+
+                // Update the context state
+                setPilot(formattedPilot);
+
+                // Reset form fields
+                setEmail('');
+                setPassword('');
+
+                // Navigate to the pilot home page
+                navigate('/pilothome');
+            } else {
+                alert('Login failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Login Error:', error);
+            alert('An error occurred during login. Please try again later.');
         }
     };
+
+
 
     const pilotSignUpHandler = () => {
         navigate('/pilotSignup');

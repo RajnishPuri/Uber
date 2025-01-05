@@ -3,9 +3,12 @@ import SearchingMap from './SearchingMap';
 import UserHomeMap from './UserHomeMap';
 import WaitingForPickup from './WaitingForPickup';
 import Uber_Logo_Black from '/Uber_Logo_Black.png';
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext, useEffect } from 'react';
 import { Locate } from 'lucide-react';
 import VehicleOptionPanel from '../components/VehicleOptionpanel';
+import { SocketContext } from '../Context/SocketContext';
+import { UserDataContext } from '../Context/UserContext';
+
 
 
 const UserHome = () => {
@@ -23,6 +26,11 @@ const UserHome = () => {
     const [vehicleData, setVehicleData] = useState({});
     const mapRef = useRef(null); // Reference for the map container
     const mapInstance = useRef(null); // Store map instance
+    const { sendMessage, receiveMessage, socket } = useContext(SocketContext);
+    const { user, setUser } = useContext(UserDataContext);
+
+
+
 
     async function submitHandler(e) {
         e.preventDefault();
@@ -40,6 +48,29 @@ const UserHome = () => {
         setStatus('showvehicleoptions');
         setIsExpanded(false);
     }
+
+    useEffect(() => {
+        // Retrieve user data from localStorage when the component mounts
+        const formattedUser = {
+            fullName: {
+                firstName: localStorage.getItem('firstName') || "",
+                lastName: localStorage.getItem('lastName') || "",
+            },
+            email: localStorage.getItem('email') || "",
+            _id: localStorage.getItem('userId') || "",  // Use 'userId' as stored in localStorage
+        };
+
+        setUser(formattedUser);
+    }, [setUser]);
+
+    useEffect(() => {
+        // Send the message only after the user state has been updated
+        if (user._id) {
+            console.log("Sending message with user ID:", user._id);
+            sendMessage('join', { userType: "user", userId: user._id });
+        }
+    }, [user]); // This effect runs when the user state changes
+
 
 
 

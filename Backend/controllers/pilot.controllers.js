@@ -3,6 +3,7 @@ const { createPilot } = require('../services/pilot.services');
 const { validationResult } = require('express-validator');
 const BlackListToken = require('../models/blackListToken.model');
 
+
 exports.registerPilot = async (req, res, next) => {
     try {
         const errors = validationResult(req);
@@ -62,21 +63,22 @@ exports.login = async (req, res, next) => {
             return res.status(400).json({ errors: error.array() });
         }
         const { email, password } = req.body;
-        const pilot = await Pilot.findOne({ email }).select('+password');
-        if (!pilot) {
+        const checkPilot = await Pilot.findOne({ email }).select('+password');
+        const pilot = await Pilot.findOne({ email });
+        if (!checkPilot) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid Credentials'
             });
         }
-        const isMatch = await pilot.comparePassword(password);
+        const isMatch = await checkPilot.comparePassword(password);
         if (!isMatch) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid Credentials'
             });
         }
-        const token = pilot.generateAuthToken();
+        const token = checkPilot.generateAuthToken();
         res.cookie('token', token, {
             httpOnly: true,
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000)

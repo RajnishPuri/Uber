@@ -1,36 +1,18 @@
 import Uber_Logo from '/Uber_Logo.png';
-import { useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { ChevronDown, Menu, X, ChevronUp } from 'lucide-react';
 import PilotAllRides from '../components/PilotAllRides';
 import { io } from 'socket.io-client';
 import PilotHomeMap from '../components/PilotHomeMap';
 import Picking from '../components/Picking';
 import Droping from '../components/Droping';
+import { PilotDataContext } from '../Context/PilotContext';
+import { SocketContext } from '../Context/SocketContext';
 
 const PilotHome = () => {
-    const [rides, setRides] = useState([
-        {
-            id: 1,
-            pickup: "101 Pine Street, New York, NY 10001",
-            drop: "456 Elm Street, Los Angeles, CA 90001",
-            price: 50,
-            vehicle: "Car",
-        },
-        {
-            id: 2,
-            pickup: "789 Maple Avenue, Houston, TX 77001",
-            drop: "123 Main Street, Springfield, IL 62701",
-            price: 50,
-            vehicle: "Bike",
-        },
-        {
-            id: 3,
-            pickup: "101 Pine Street, New York, NY 10001",
-            drop: "456 Elm Street, Los Angeles, CA 90001",
-            price: 50,
-            vehicle: "Auto",
-        },
-    ]);
+    const { pilot, setPilot } = useContext(PilotDataContext);
+    const { sendMessage, receiveMessage, socket } = useContext(SocketContext);
+    const [rides, setRides] = useState([]);
 
     const [currentRide, setCurrentRide] = useState(null);
 
@@ -77,6 +59,90 @@ const PilotHome = () => {
     const handleLocationChange = (newLocation) => {
         setCurrentLocation(newLocation);
     };
+
+    useEffect(() => {
+        // Retrieve pilot data from localStorage when the component mounts
+        const formattedPilot = {
+            fullName: {
+                firstName: localStorage.getItem('firstName') || "",
+                lastName: localStorage.getItem('lastName') || "",
+            },
+            email: localStorage.getItem('email') || "",
+            vehicleColor: localStorage.getItem('vehicleColor') || "",
+            vehicleNumber: localStorage.getItem('vehicleNumber') || "",
+            vehicleType: localStorage.getItem('vehicleType') || "",
+            vehicleCapacity: localStorage.getItem('vehicleCapacity') || "",
+            _id: localStorage.getItem('userId') || "",  // Use 'userId' as stored in localStorage
+        };
+
+        setPilot(formattedPilot);
+
+    }, [setPilot]);
+
+    useEffect(() => {
+        // Send the message only after the pilot state has been updated
+        if (pilot._id) {
+            console.log("Sending message with pilot ID:", pilot._id);
+            sendMessage('join', { userType: "pilot", userId: pilot._id });
+        }
+    }, [pilot]);
+
+    useEffect(() => {
+        const updateLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        socket.emit('update-location-pilot', {
+                            userId: pilot._id,
+                            location: {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            },
+                        });
+                    },
+                    (error) => {
+                        console.error('Error getting location:', error.message);
+                    }
+                );
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+            }
+        };
+
+        // Set up interval to update location every 5 seconds
+        const locationInterval = setInterval(updateLocation, 5000);
+
+        // Update location immediately
+        updateLocation();
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(locationInterval);
+    }, [socket, pilot]);
+
+    useEffect(() => {
+        // Setup the socket event listener only once
+        const handleNewRide = (data) => {
+            console.log("Received new ride:", data);
+
+            // Check if data already exists in the rides array to prevent duplicates
+            setRides((prevRides) => {
+                // Check if this ride is already in the array
+                if (!prevRides.some((ride) => ride._id === data._id)) {
+                    return [...prevRides, data];
+                }
+                return prevRides;
+            });
+        };
+
+        socket.on('new-ride', handleNewRide);
+
+        // Cleanup: Remove the event listener when the component unmounts
+        return () => {
+            socket.off('new-ride', handleNewRide);
+        };
+    }, [socket]);
+
+
 
     return (
         <div className="relative h-screen overflow-hidden">

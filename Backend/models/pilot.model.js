@@ -57,19 +57,27 @@ const pilotSchema = new mongoose.Schema({
         }
     },
     location: {
-        lat: {
-            type: Number,
+        type: {
+            type: String,
+            enum: ['Point'], // Must be 'Point'
+            required: true,
+            default: 'Point'
         },
-        lng: {
-            type: Number,
+        coordinates: {
+            type: [Number], // Array of [longitude, latitude]
+            required: true,
+            default: [0, 0]
         }
     }
 });
 
+// Add a 2dsphere index on the location field for geospatial queries
+pilotSchema.index({ location: '2dsphere' });
+
 pilotSchema.methods.generateAuthToken = function () {
     const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     return token;
-}
+};
 
 pilotSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
@@ -77,6 +85,6 @@ pilotSchema.methods.comparePassword = async function (password) {
 
 pilotSchema.statics.hashPassword = async (password) => {
     return await bcrypt.hash(password, 10);
-}
+};
 
 module.exports = mongoose.model("Pilot", pilotSchema);

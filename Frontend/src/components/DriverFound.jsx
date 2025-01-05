@@ -1,44 +1,58 @@
-import { useEffect } from "react";
+import { useEffect, useState, useContext } from "react";
 import { MapPin, MapPinHouse, IndianRupee, Lock } from "lucide-react";
 import Uber_Car from '/Uber_Car.jpg';
 import Uber_Bike from '/Uber_Bike.jpg';
 import Uber_Auto from '/Uber_Auto.jpg';
 import { io } from "socket.io-client";
+import { SocketContext } from "../Context/SocketContext";
 
 const DriverFound = ({
-    driverData,
-    setConfirmVehicle,
-    setDriverData,
-    setIsRiding,
-    setIsRidingConfirmed,
-    isRidingConfirmed
+    driverData
 }) => {
+    const [isRidingConfirmed, setIsRidingConfirmed] = useState(false);
+    const { socket, sendMessage, receiveMessage } = useContext(SocketContext);
+
     useEffect(() => {
-        // Connect to the WebSocket server
-        const socket = io("https://your-backend-server.com");
-
-        // Join a room or listen for events related to this ride
-        socket.emit("join-ride-room", { rideId: driverData.rideId });
-
-        // Listen for confirmation from the backend
-        socket.on("ride-confirmed", (data) => {
-            if (data.rideId === driverData.rideId) {
-                setIsRidingConfirmed(true);
-            }
+        socket.on('ride-started', (data) => {
+            console.log('Ride Started:', data);
+            setIsRidingConfirmed(true);
         });
+    }, [socket])
+    // useEffect(() => {
+    //     // Connect to the WebSocket server
+    //     const socket = io("https://your-backend-server.com");
 
-        // Cleanup when the component unmounts
-        return () => {
-            socket.disconnect();
-        };
-    }, [driverData, setIsRidingConfirmed, setIsRiding]);
+    //     // Join a room or listen for events related to this ride
+    //     socket.emit("join-ride-room", { rideId: driverData.rideId });
+
+    //     // Listen for confirmation from the backend
+    //     socket.on("ride-confirmed", (data) => {
+    //         if (data.rideId === driverData.rideId) {
+    //             setIsRidingConfirmed(true);
+    //         }
+    //     });
+
+    //     // Cleanup when the component unmounts
+    //     return () => {
+    //         socket.disconnect();
+    //     };
+    // }, [driverData, setIsRidingConfirmed, setIsRiding]);
 
     return (
         <div className="text-center">
             {isRidingConfirmed ? (
-                <h2 className="text-green-600 font-bold text-xl">
-                    Ride Confirmed! Payment option is available now.
-                </h2>
+                <div>
+
+                    <h2 className="text-green-600 font-bold text-xl">
+                        Ride Confirmed! Payment option is available now.
+
+                    </h2>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => window.location.reload()}
+                    >
+                        Pay Now
+                    </button>
+                </div>
             ) : (
                 <>
                     <div className="flex justify-between p-3">
@@ -60,9 +74,9 @@ const DriverFound = ({
                                 <img className="w-12 h-12" src={driverData.image} alt="Driver" />
                             </div>
                             <div>
-                                <h2 className="font-bold text-xl text-end">{driverData.name}</h2>
-                                <h3 className="text-gray-900 text-end font-bold text-xl">{driverData.vehicleNumber}</h3>
-                                <h3 className="text-gray-500 text-end">{driverData.vehicleDetails}</h3>
+                                <h2 className="font-bold text-xl text-end">{driverData.pilot.fullName?.firstName}</h2>
+                                <h3 className="text-gray-900 text-end font-bold text-xl">{driverData.pilot.vehicle?.plate}</h3>
+                                <h3 className="text-gray-500 text-end">{driverData.pilot.vehicle?.color}</h3>
                             </div>
                         </div>
                     </div>
@@ -72,7 +86,7 @@ const DriverFound = ({
                             <MapPin />
                         </div>
                         <div>
-                            <h4 className="font-bold">{driverData.pickupLocation}</h4>
+                            <h4 className="font-bold">{driverData.pickup}</h4>
                         </div>
                     </div>
 
@@ -92,7 +106,7 @@ const DriverFound = ({
                     <div className="flex items-center gap-2 w-full p-3 justify-between">
                         <div className="flex items-center">
                             <IndianRupee className="w-8 h-8" />
-                            <h4 className="font-bold text-xl">{driverData.fare}</h4>
+                            <h4 className="font-bold text-xl">{driverData.price}</h4>
                         </div>
                         <div>
                             <h4 className="font-bold text-xl">{driverData.paymentMethod}</h4>
@@ -115,17 +129,18 @@ const DriverFound = ({
                         <button
                             className="bg-red-600 text-white px-4 py-2 rounded-md w-1/2"
                             onClick={() => {
-                                setConfirmVehicle(false);
-                                setDriverData(null);
-                                setIsRiding(false);
+                                // setConfirmVehicle(false);
+                                // setDriverData(null);
+                                // setIsRiding(false);
                             }}
                         >
                             Cancel Ride
                         </button>
                     </div>
                 </>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

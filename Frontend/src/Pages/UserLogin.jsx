@@ -15,23 +15,42 @@ const UserLogin = () => {
 
     const formSubmit = async (e) => {
         e.preventDefault();
-        const newUserData = { email: email, password: password };
+        const newUserData = { email, password };
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/login`, newUserData);
             alert('User Logged In Successfully');
-            setUser(response.data);
+
+            // Log the response to debug
+            console.log('Response Data:', response.data);
+
+            // Format and update user
+            const formattedUser = {
+                fullName: {
+                    firstName: response.data.user.fullName?.firstName || "",
+                    lastName: response.data.user.fullName?.lastName || ""
+                },
+                email: response.data.user.email || "",
+                _id: response.data.user._id || ""
+            };
+
+            setUser(formattedUser);
+
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('role', response.data.role);
+            localStorage.setItem('firstName', response.data.user.fullName?.firstName);
+            localStorage.setItem('lastName', response.data.user.fullName?.lastName);
+            localStorage.setItem('email', response.data.user.email);
+            localStorage.setItem('userId', response.data.user._id);
             navigate('/userhome');
-        }
-        catch (e) {
-            console.log(e);
+        } catch (error) {
+            console.error('Error during login:', error);
         }
 
         setEmail('');
         setPassword('');
     };
+
 
     const signUpHandler = () => {
         navigate('/userSignup');

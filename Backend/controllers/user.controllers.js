@@ -40,16 +40,17 @@ exports.login = async (req, res, next) => {
         });
     }
 
-    const user = await User.findOne({ email: email }).select('+password');
+    const checkUser = await User.findOne({ email: email }).select('+password');
+    const user = await User.findOne({ email: email });
 
-    if (!user) {
+    if (!checkUser) {
         return res.status(401).json({
             success: false,
             message: "Invalid email or password!"
         });
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await checkUser.comparePassword(password);
 
     if (!isMatch) {
         return res.status(401).json({
@@ -58,14 +59,16 @@ exports.login = async (req, res, next) => {
         });
     }
 
-    const token = user.generateAuthToken();
+    const token = checkUser.generateAuthToken();
     res.cookie('token', token);
+
 
     res.status(200).json({
         success: true,
         message: "Login successful!",
         token,
-        role: "user"
+        role: "user",
+        user
     });
 };
 

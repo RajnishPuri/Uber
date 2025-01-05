@@ -6,20 +6,19 @@ export const PilotDataContext = createContext();
 const PilotContext = ({ children }) => {
 
     const [pilot, setPilot] = useState({
-        user: {
-            fullName: {
-                firstName: "",
-                lastName: ""
-            },
-            email: "",
-            password: "",
-            vehicleColor: "",
-            vehicleNumber: "",
-            vehicleType: "",
-            vehicleCapacity: ""
 
+        fullName: {
+            firstName: "",
+            lastName: ""
+        },
+        email: "",
+        password: "",
+        vehicleColor: "",
+        vehicleNumber: "",
+        vehicleType: "",
+        vehicleCapacity: "",
+        _id: ""
 
-        }
     })
 
     return (
