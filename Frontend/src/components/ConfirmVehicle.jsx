@@ -6,7 +6,7 @@ import { useState } from 'react';
 import DriverFound from './DriverFound';
 import Uber_Driver from '/Uber_Driver.png';
 
-const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickupLocation, setIsRiding, setIsRidingConfirmed, isRidingConfirmed, isRiding }) => {
+const ConfirmVehicle = ({ rideData }) => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [isLookingForDriver, setIsLookingForDriver] = useState(false);
     const [driverData, setDriverData] = useState(null);
@@ -16,6 +16,8 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
     const toggleVisibility = () => {
         setIsHidden((prev) => !prev);
     };
+
+
 
     const driverDetailDemo = {
         name: 'John Doe',
@@ -38,35 +40,32 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
     const submitHandler = async () => {
         setIsLookingForDriver(true);
 
-        const dataToSend = {
-            vehicleType: confirmVehicle.type,
-            price: confirmVehicle.price,
-            pickupLocation,
-            destination,
-            paymentMethod,
-        };
+        const dataToSend = rideData;
 
         console.log('Searching for driver with data:', dataToSend);
 
         setTimeout(async () => {
             try {
-                // const response = await fetch('https://your-backend-api-endpoint.com/get-driver', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(dataToSend),
-                // });
-
-                // if (response.ok) {
-                //     const driverDetails = await response.json();
-                //     setDriverData(driverDetails); // Set the fetched driver data
-                // } else {
-                //     console.error('Failed to fetch driver details');
-                // }
+                const response = await fetch('http://localhost:3000/api/v1/ride/create-ride', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                    body: JSON.stringify({
+                        pickup: rideData.pickup,
+                        destination: rideData.destination,
+                        type: rideData.type,
+                        price: rideData.price,
+                        distance: rideData.distance,
+                        paymentMethod: paymentMethod,
+                    }),
+                });
+                const data = await response.json();
+                console.log(data);
                 // Set the fetched driver data
-                setDriverData(driverDetailDemo);
-                setIsRiding(true);
+                // setDriverData(driverDetailDemo);
+                // setIsRiding(true);
 
             } catch (error) {
                 console.error('Error fetching driver details:', error);
@@ -77,8 +76,11 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
     };
 
     const cancelHandler = () => {
-        setIsLookingForDriver(false);
-        setConfirmVehicle(false);
+        // setIsLookingForDriver(false);
+        // setConfirmVehicle(false);
+
+        window.location.reload(); // Reload the page
+
     };
 
     return (
@@ -98,7 +100,8 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
 
                     {isLookingForDriver ? (
                         driverData ? (
-                            <DriverFound driverData={driverData} setConfirmVehicle={setConfirmVehicle} setDriverData={setDriverData} setIsRiding={setIsRiding} setIsRidingConfirmed={setIsRidingConfirmed} isRidingConfirmed={isRidingConfirmed} isRiding={isRiding} />
+                            <></>
+                            // <DriverFound driverData={driverData} setConfirmVehicle={setConfirmVehicle} setDriverData={setDriverData} setIsRiding={setIsRiding} setIsRidingConfirmed={setIsRidingConfirmed} isRidingConfirmed={isRidingConfirmed} isRiding={isRiding} />
                         ) : (
                             <div className="flex flex-col items-center justify-center gap-4 mt-4">
                                 <div className="loader border-4 border-t-green-600 border-gray-300 rounded-full w-12 h-12 animate-spin"></div>
@@ -116,13 +119,13 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
                                 <img
                                     className="w-32"
                                     src={
-                                        confirmVehicle.type === 'Car'
+                                        rideData.type === 'Car'
                                             ? Uber_Car
-                                            : confirmVehicle.type === 'Bike'
+                                            : rideData.type === 'Bike'
                                                 ? Uber_Bike
                                                 : Uber_Auto
                                     }
-                                    alt={confirmVehicle.type}
+                                    alt={rideData.type}
                                 />
                             </div>
 
@@ -133,7 +136,7 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
                                     <MapPin />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold">{pickupLocation}</h4>
+                                    <h4 className="font-bold">{rideData.pickup}</h4>
                                 </div>
                             </div>
 
@@ -144,7 +147,7 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
                                     <MapPin />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold">{destination}</h4>
+                                    <h4 className="font-bold">{rideData.destination}</h4>
                                 </div>
                             </div>
 
@@ -152,7 +155,7 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
 
                             <div className="flex items-center justify-center gap-2 w-full p-1">
                                 <CreditCard className="w-8 h-8" />
-                                <h4 className="font-bold text-xl">₹ {confirmVehicle.price}</h4>
+                                <h4 className="font-bold text-xl">₹ {rideData.price}</h4>
                             </div>
 
                             <hr className="border-t-2 border-gray-300" />
@@ -202,7 +205,7 @@ const ConfirmVehicle = ({ setConfirmVehicle, confirmVehicle, destination, pickup
                         </>
                     )}
                 </div>
-            </div>
+            </div >
         </div >
     );
 };

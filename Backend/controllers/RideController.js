@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const Pilot = require('../models/pilot.model');
 const { getAddressCoordinate } = require('../services/maps.services');
 const { getDrivingDistanceWithCoordinates } = require('../controllers/mapController');
+const Ride = require('../models/ride.model');
 
 exports.initializeRide = async (req, res) => {
     function isLatLong(input) {
@@ -50,9 +51,9 @@ exports.initializeRide = async (req, res) => {
             console.log('Distance:', distanceData);
 
             const vehicles = [
-                { type: 'Car', speed: 60, pricePerKm: 1.5 },
-                { type: 'Bike', speed: 40, pricePerKm: 0.5 },
-                { type: 'Auto', speed: 50, pricePerKm: 1 },
+                { type: 'Car', speed: 60, pricePerKm: 1.5, seats: 4 },
+                { type: 'Bike', speed: 40, pricePerKm: 0.5, seats: 2 },
+                { type: 'Auto', speed: 50, pricePerKm: 1, seats: 3 },
             ];
 
             // Calculate price and time for each vehicle type
@@ -69,6 +70,7 @@ exports.initializeRide = async (req, res) => {
                     timeTaken: `${hours} hours ${minutes} mins`, // Formatted as hours and minutes
                     price: `${price.toFixed(2)}`,
                     duration: distanceData.duration,
+                    seats: vehicle.seats,
                 };
             });
 
@@ -112,9 +114,9 @@ exports.initializeRide = async (req, res) => {
             console.log('Distance:', distanceData);
 
             const vehicles = [
-                { type: 'Car', speed: 60, pricePerKm: 1.5 },
-                { type: 'Bike', speed: 40, pricePerKm: 0.5 },
-                { type: 'Auto', speed: 50, pricePerKm: 1 },
+                { type: 'Car', speed: 60, pricePerKm: 1.5, seats: 4 },
+                { type: 'Bike', speed: 40, pricePerKm: 0.5, seats: 2 },
+                { type: 'Auto', speed: 50, pricePerKm: 1, seats: 3 },
             ];
 
             // Calculate price and time for each vehicle type
@@ -131,6 +133,7 @@ exports.initializeRide = async (req, res) => {
                     timeTaken: `${hours} hours ${minutes} mins`, // Formatted as hours and minutes
                     price: `${price.toFixed(2)}`,
                     duration: distanceData.duration,
+                    seats: vehicle.seats
                 };
             });
 
@@ -151,4 +154,36 @@ exports.initializeRide = async (req, res) => {
     }
 };
 
+
+exports.createRide = async (req, res) => {
+    try {
+        const user = req.user;
+        const { type, pickup, destination, price, duration, distance, paymentMethod } = req.body;
+
+        const otp = Math.floor(1000 + Math.random() * 9000);
+
+        const ride = new Ride({
+            pickup,
+            destination,
+            distance,
+            price,
+            vehicleType: type,
+            user: user._id,
+            otp,
+            paymentMethod
+        });
+
+        const savedRide = await ride.save();
+        console.log('Saved Ride:', savedRide);
+        return res.status(200).json({
+            success: true,
+            message: 'Ride created successfully.',
+            ride: savedRide,
+        });
+    } catch (error) {
+        console.error('Error creating ride:', error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
+
+}
 

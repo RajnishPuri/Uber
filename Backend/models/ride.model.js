@@ -38,6 +38,16 @@ const rideSchema = new mongoose.Schema({
         enum: ['pending', 'accepted', 'completed', 'cancelled'],
         default: 'pending',
     },
+    otp: {
+        type: Number,
+        select: false,
+        requires: true,
+    },
+    paymentMethod: {
+        type: String,
+        enum: ['cash', 'credit-card', 'debit-card'],
+        default: 'cash',
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Ride', rideSchema);

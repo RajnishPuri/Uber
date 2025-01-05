@@ -38,8 +38,6 @@ const UserHome = () => {
         // console.log(data);
         setVehicleData(data);
         setStatus('showvehicleoptions');
-        setPickup('');
-        setDestination('');
         setIsExpanded(false);
     }
 
@@ -216,7 +214,7 @@ const UserHome = () => {
                                             className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                                             onClick={() => {
                                                 handleSuggestionClick(suggestion, 'pickup')
-                                                console.log(suggestion);
+
                                             }}
                                         >
                                             {suggestion.description || 'No description available'} {/* Adjust if needed */}
@@ -254,7 +252,7 @@ const UserHome = () => {
                     ) :
                     status === 'waitingforpickup' ? (<DriverInfoForPickup />) :
                         status === 'riding' ? (<RidingData />) :
-                            status === 'showvehicleoptions' ? (<VehicleOptionPanel vehicleData={vehicleData} setVehicleData={setVehicleData} status={status} setStatus={setStatus} />) : null
+                            status === 'showvehicleoptions' ? (<VehicleOptionPanel vehicleData={vehicleData} setVehicleData={setVehicleData} status={status} setStatus={setStatus} pickup={pickup} destination={destination} />) : null
                 }
             </div>
         </div>
